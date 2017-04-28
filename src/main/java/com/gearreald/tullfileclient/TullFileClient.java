@@ -60,7 +60,6 @@ public class TullFileClient extends Application {
         });
         
 		Scene scene = new Scene(grid, 300, 275);*/
-		System.out.println(getClass().getClassLoader().getResource("fxml/login.fxml"));
 		Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/login.fxml"));
        
         Scene scene = new Scene(root, 300, 275);
