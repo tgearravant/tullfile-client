@@ -13,7 +13,6 @@
 		<Text fx:id="header"/>
 	</top>
 	<center>
-		<ScrollPane fx:id = "centerScroll">
-		</ScrollPane>
+		<ListView fx:id = "fileList"/>
 	</center>
 </BorderPane>

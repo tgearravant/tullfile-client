@@ -3,9 +3,8 @@ package com.gearreald.tullfileclient.controllers;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.gearreald.tullfileclient.Environment;
+import com.gearreald.tullfileclient.models.ServerConnection;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,7 +15,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import net.tullco.tullutils.NetworkUtils;
 
 public class LoginController {
 	@FXML private Text headerText;
@@ -39,7 +37,7 @@ public class LoginController {
     	Environment.setConfiguration("HOSTNAME", serverAddress);
     	Environment.setConfiguration("API_KEY", apiKey);
     	try {
-			NetworkUtils.getDataFromURL(serverAddress, false, NetworkUtils.HEAD, Pair.of("Authorization", apiKey));
+			ServerConnection.checkKey();
 		} catch (MalformedURLException e) {
 			actionTarget.setText("Invalid Server Address.");
 			System.err.println(e.getMessage());
