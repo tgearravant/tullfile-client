@@ -5,6 +5,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+<?import javafx.scene.layout.HBox?>
 
 <BorderPane fx:controller="com.gearreald.tullfileclient.controllers.InterfaceController" 
     xmlns:fx="http://javafx.com/fxml">
@@ -15,4 +16,21 @@
 	<center>
 		<ListView fx:id = "fileList"/>
 	</center>
+	<bottom>
+		<HBox>
+			<Button fx:id="refreshButton"
+				text="Refresh File List"/>
+			<Button fx:id="exitButton"
+				text="Exit"
+				onAction="#exitApplication"/>
+		</HBox>
+	</bottom>
+	<right>
+		<VBox>
+			<Button fx:id="downloadButton"
+				text="Download"/>
+			<Button fx:id="uploadButton"
+				text="Upload"/>
+		</VBox>
+	</right>
 </BorderPane>
