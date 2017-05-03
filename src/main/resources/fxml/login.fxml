@@ -19,20 +19,24 @@
         GridPane.columnIndex="0" GridPane.rowIndex="1"/>
  
     <TextField fx:id="serverAddressField"
-        GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+        GridPane.columnIndex="1" GridPane.rowIndex="1"
+        onKeyPressed="#keyListener"/>
  
  	<Label
  		text="Port:"
  		GridPane.columnIndex="0" GridPane.rowIndex="2"/>
  	<TextField fx:id="portField"
- 		GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+ 		GridPane.columnIndex="1" GridPane.rowIndex="2"
+ 		onKeyPressed="#keyListener"/>
  
     <Label
 		text="API Key:"
         GridPane.columnIndex="0" GridPane.rowIndex="3"/>
  
     <PasswordField fx:id="keyField" 
-        GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+        GridPane.columnIndex="1" GridPane.rowIndex="3"
+        onKeyPressed="#keyListener"/>
+
 	<HBox spacing="10" alignment="bottom_right" 
         GridPane.columnIndex="1" GridPane.rowIndex="5">
         <Button text="Sign In"     

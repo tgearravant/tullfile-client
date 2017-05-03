@@ -15,6 +15,8 @@ public class TullFileClient extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		primaryStage.setTitle("TullFile Downloader v0.1");
+		Environment.setConfiguration("TESTING", "t");
+		Environment.setConfiguration("FOLDER_LOCATION","C:/TullFileTest/");
 /*		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
 		grid.setHgap(10);

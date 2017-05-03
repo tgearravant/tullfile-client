@@ -1,9 +1,12 @@
 package com.gearreald.tullfileclient;
 
 import java.util.HashMap;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.gearreald.tullfileclient.worker.Workable;
+
+import net.tullco.tullutils.NullUtils;
 
 public class Environment {
 	private static HashMap<String,String> configuration = new HashMap<String,String>();
@@ -15,12 +18,9 @@ public class Environment {
 	}
 	
 	public static String getConfiguration(String key){
-		return configuration.get(key);
+		return NullUtils.coalesce(configuration.get(key),"");
 	}
-	public void addJobToQueue(Workable j){
-		jobQueue.add(j);
-	}
-	public Workable getNextJobInQueue(){
-		return jobQueue.poll();
+	public static Queue<Workable> getJobQueue(){
+		return jobQueue;
 	}
 }

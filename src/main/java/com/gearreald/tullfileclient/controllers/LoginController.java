@@ -13,6 +13,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -26,12 +28,24 @@ public class LoginController {
     public final static String DEFAULT_PORT="12345";
     
     @FXML public void initialize(){
-    	portField.setText(DEFAULT_PORT);
+    	this.portField.setText(DEFAULT_PORT);
+    	if(Environment.getConfiguration("TESTING").equals("t")){
+    		testingAutofill();
+    	}
+    }
+    
+    @FXML public void keyListener(KeyEvent event) {
+    	if(event.getCode() == KeyCode.ENTER){
+    		event.consume();
+    		changeToInterface();
+    	}
     }
     
     @FXML public void handleSubmitButtonAction(ActionEvent event) {
-    	
-    	//First, let's see if a server actually exists with the given details.
+    	changeToInterface();
+    }
+    
+    private void changeToInterface(){
     	String serverAddress = "http://"+this.serverAddressField.getText()+":"+this.portField.getText()+"/";
     	String apiKey = this.keyField.getText();
     	Environment.setConfiguration("HOSTNAME", serverAddress);
@@ -65,5 +79,10 @@ public class LoginController {
     	Stage stage = (Stage) actionTarget.getScene().getWindow();
 		Scene scene = new Scene(root,600,400);
     	stage.setScene(scene);
+    }
+    
+    private void testingAutofill(){
+		this.serverAddressField.setText("127.0.0.1");
+		this.keyField.setText("lol");
     }
 }
