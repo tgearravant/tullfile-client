@@ -18,7 +18,10 @@ public class TullFile {
 		}
 		return this.parent.getLocalPath()+this.getName();
 	}
+	public int getPieces(){
+		return 1;
+	}
 	public void downloadFile(){
-		
+		System.out.println(this.getName()+" isn't really downloading. No downloads are implemented yet.");
 	}
 }

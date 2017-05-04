@@ -24,6 +24,7 @@ public class ServerConnection {
 	}
 	public static JSONObject getFileListing(TullFolder f) throws IOException{
 		JSONObject request = new JSONObject();
+		request.put("directory", f.getLocalPath());
 		String response = NetworkUtils.sendDataToURL(
 				getURLFor("LIST")
 				,false
@@ -47,5 +48,8 @@ public class ServerConnection {
 			default:
 				return baseURL;
 		}
+	}
+	private static void uploadFile(File file){
+		
 	}
 }

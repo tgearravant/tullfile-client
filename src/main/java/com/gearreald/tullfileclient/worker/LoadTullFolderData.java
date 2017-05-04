@@ -10,6 +10,6 @@ public class LoadTullFolderData implements Workable {
 		this.folder=f;
 	}
 	public void work() throws Exception {
-		this.folder.fetchFolderData();
+		this.folder.fetchFolderData(false);
 	}
 }

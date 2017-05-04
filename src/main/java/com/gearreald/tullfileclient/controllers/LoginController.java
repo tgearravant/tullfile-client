@@ -29,7 +29,7 @@ public class LoginController {
     
     @FXML public void initialize(){
     	this.portField.setText(DEFAULT_PORT);
-    	if(Environment.getConfiguration("TESTING").equals("t")){
+    	if(Environment.inTesting()){
     		testingAutofill();
     	}
     }

@@ -8,7 +8,10 @@
 <?import javafx.scene.layout.HBox?>
 
 <BorderPane fx:controller="com.gearreald.tullfileclient.controllers.InterfaceController" 
-    xmlns:fx="http://javafx.com/fxml">
+    xmlns:fx="http://javafx.com/fxml"
+    fx:id="borderPane"
+    stylesheets="@../css/global.css"
+    >
 	<padding><Insets top="25" right="25" bottom="10" left="25"/></padding>
 	<top>
 		<Text fx:id="header"/>
@@ -18,19 +21,15 @@
 	</center>
 	<bottom>
 		<HBox>
+			<Button fx:id="uploadButton"
+				text="Upload New File"
+				onAction="#uploadFile"/>
 			<Button fx:id="refreshButton"
-				text="Refresh File List"/>
+				text="Refresh File List"
+				onAction="#refreshFolder"/>
 			<Button fx:id="exitButton"
 				text="Exit"
 				onAction="#exitApplication"/>
 		</HBox>
 	</bottom>
-	<right>
-		<VBox>
-			<Button fx:id="downloadButton"
-				text="Download"/>
-			<Button fx:id="uploadButton"
-				text="Upload"/>
-		</VBox>
-	</right>
 </BorderPane>
