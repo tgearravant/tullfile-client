@@ -7,8 +7,8 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.gearreald.tullfileclient.Environment;
 import com.gearreald.tullfileclient.worker.LoadTullFolderData;
+import com.gearreald.tullfileclient.worker.WorkerQueues;
 
 public class TullFolder {
 	
@@ -56,7 +56,7 @@ public class TullFolder {
 		System.out.println(folderJSON);
 		fromJSON(folderJSON.getJSONObject("response"));
 		for(TullFolder folder: this.subfolders){
-			Environment.getJobQueue().add(new LoadTullFolderData(folder));
+			WorkerQueues.addJobToQueue("quick", new LoadTullFolderData(folder));
 		}
 		this.fetched=true;
 	}

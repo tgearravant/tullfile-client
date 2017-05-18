@@ -3,8 +3,11 @@ package com.gearreald.tullfileclient.controllers;
 import java.io.File;
 import java.io.IOException;
 
+import com.gearreald.tullfileclient.models.ServerConnection;
 import com.gearreald.tullfileclient.models.TullFile;
 import com.gearreald.tullfileclient.models.TullFolder;
+import com.gearreald.tullfileclient.worker.UploadFile;
+import com.gearreald.tullfileclient.worker.WorkerQueues;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -48,6 +51,7 @@ public class InterfaceController {
 		FileChooser chooser = new FileChooser();
 		File file = chooser.showOpenDialog(borderPane.getScene().getWindow());
 		System.out.println(file.getAbsolutePath());
+		WorkerQueues.addJobToQueue("upload", new UploadFile(file));
 	}
 	public void setDisplayFolder(TullFolder f,boolean forceRefresh){
 		this.current=f;
