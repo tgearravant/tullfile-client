@@ -25,7 +25,7 @@ public class ServerConnection {
 				getURLFor("AUTH")
 				,false
 				,NetworkUtils.HEAD
-				,Pair.of("Authorization", Environment.getConfiguration("API_KEY")));
+				,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
 		return true;
 	}
 	public static JSONObject getFileListing(TullFolder f) throws IOException{
@@ -36,35 +36,42 @@ public class ServerConnection {
 				,false
 				,NetworkUtils.POST
 				,request.toString()
-				,Pair.of("Authorization", Environment.getConfiguration("API_KEY")));
+				,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
 		return new JSONObject(response);
 	}
 	public static File downloadFile(TullFile f){
 		//TODO Need to download files at some point. (wasntme)
 		return null;
 	}
-	public static void uploadFile(File file, String filePath) throws IOException{
+	public static void uploadFile(File file, String filePath, String fileName) throws IOException{
 		byte[] byteBuffer = new byte[CHUNK_SIZE];
 		FileInputStream f = new FileInputStream(file);
-		for(int i=1; f.read(byteBuffer)!=-1; i++){
-			int bytesInBuffer = f.read(byteBuffer);
-			sendByteStream(byteBuffer, bytesInBuffer, i, filePath);
+		try{
+			for(int i=1; f.read(byteBuffer)!=-1; i++){
+				int bytesInBuffer = f.read(byteBuffer);
+				JSONObject json = sendByteStream(byteBuffer, bytesInBuffer, i, filePath, fileName);
+				if(json.getString("status").equals("failure")){
+					throw new IOException("Upload failed.");
+				}
+			}
+		}finally{
+			f.close();
 		}
-		f.close();
 	}
 	public static JSONObject sendByteStream(
 			byte[] byteBuffer
 			,int bytesInBuffer
 			,int pieceNumber
-			,String filePath) throws MalformedURLException, IOException {
-		String response = NetworkUtils.sendBinaryDataToURL(
+			,String filePath
+			,String fileName) throws MalformedURLException, IOException {
+		String response = NetworkUtils.sendDataToURL(
 				getURLFor("UPLOAD")
 				,false
 				,NetworkUtils.POST
-				,byteBuffer
-				,bytesInBuffer
-				,Pair.of("pieceNumber", Integer.toString(pieceNumber))
-				,Pair.of("localPath", filePath));
+				,"LOL"
+				,Pair.<String,String>of("pieceNumber", Integer.toString(pieceNumber))
+				,Pair.<String,String>of("localPath", filePath)
+				,Pair.<String,String>of("fileName", fileName));
 		return new JSONObject(response);
 	}
 	private static String getURLFor(String location){

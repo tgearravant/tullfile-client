@@ -7,7 +7,7 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.gearreald.tullfileclient.worker.LoadTullFolderData;
+import com.gearreald.tullfileclient.job.LoadTullFolderData;
 import com.gearreald.tullfileclient.worker.WorkerQueues;
 
 public class TullFolder {
@@ -60,7 +60,7 @@ public class TullFolder {
 		}
 		this.fetched=true;
 	}
-	protected void fromJSON(JSONObject json){
+	private void fromJSON(JSONObject json){
 		JSONArray fileArray = json.getJSONArray("files");
 		JSONArray folderArray = json.getJSONArray("subfolders");
 		for(int i=0;i<fileArray.length();i++){

@@ -1,18 +1,19 @@
 package com.gearreald.tullfileclient;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.gearreald.tullfileclient.worker.Workable;
 import com.gearreald.tullfileclient.worker.Worker;
 
 import net.tullco.tullutils.NullUtils;
 
 public class Environment {
+	
+	private static final int UPLOAD_WORKERS=1;
+	private static final int DOWNLOAD_WORKERS=2;
+	private static final int QUICK_WORKERS=2;
+	
 	private static HashMap<String,String> configuration = new HashMap<String,String>();
 	
 	private static Set<Worker> workerList = ConcurrentHashMap.<Worker>newKeySet();
@@ -37,11 +38,17 @@ public class Environment {
 		return true;
 	}
 	public static void initializeWorkers(){
-		workerList.add(new Worker("upload"));
-		workerList.add(new Worker("download"));
-		workerList.add(new Worker("download"));
-		workerList.add(new Worker("quick"));
-		workerList.add(new Worker("quick"));
+		for(int i=0;i<UPLOAD_WORKERS;i++){
+			workerList.add(new Worker("upload_"+i,"upload"));
+		}
+
+		for(int i=0;i<DOWNLOAD_WORKERS;i++){
+			workerList.add(new Worker("download_"+i,"download"));
+		}
+
+		for(int i=0;i<QUICK_WORKERS;i++){
+			workerList.add(new Worker("quick_"+i,"quick"));
+		}
 	}
 	public static void startWorkers(){
 		for(Worker w: workerList){

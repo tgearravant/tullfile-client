@@ -70,8 +70,13 @@ public class TullFileClient extends Application {
 		
         primaryStage.show();
 		
+        Environment.initializeWorkers();
+        Environment.startWorkers();
 		// TODO Auto-generated method stub
 		
 	}
-
+	@Override
+	public void stop(){
+		Environment.stopWorkers();
+	}
 }
