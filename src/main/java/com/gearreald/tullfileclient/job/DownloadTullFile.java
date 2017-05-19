@@ -1,5 +1,7 @@
 package com.gearreald.tullfileclient.job;
 
+import java.io.IOException;
+
 import com.gearreald.tullfileclient.models.TullFile;
 import com.gearreald.tullfileclient.worker.WorkerException;
 
@@ -14,8 +16,12 @@ public class DownloadTullFile extends Job {
 		this.done=false;
 	}
 	public void work() throws WorkerException{
-		this.file.downloadFile();
-		this.done=true;
+		try{
+			this.file.downloadFile();
+			this.done=true;
+		}catch(IOException e){
+			throw new WorkerException("Download Failed",e);
+		}
 	}
 	@Override
 	public String getJobName() {

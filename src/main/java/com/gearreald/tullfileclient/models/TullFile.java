@@ -1,5 +1,8 @@
 package com.gearreald.tullfileclient.models;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 public class TullFile {
 	
 	private String name;
@@ -14,14 +17,22 @@ public class TullFile {
 	}
 	public String getLocalPath(){
 		if(this.parent==null){
-			return this.getName();
+			return "/";
 		}
-		return this.parent.getLocalPath()+this.getName();
+		return this.parent.getLocalPath();
 	}
 	public int getPieces(){
-		return 1;
+		return 13;
 	}
-	public void downloadFile(){
-		System.out.println(this.getName()+" isn't really downloading. No downloads are implemented yet.");
+	public void downloadFile() throws IOException{
+		File f=new File("C:/Users/tgearr34/TullFile/test.txt");
+		String localPath = this.getLocalPath();
+		String fileName = this.getName();
+		FileOutputStream output = new FileOutputStream(f);
+		for(int i=1;i<=this.getPieces();i++){
+			byte[] pieceData = ServerConnection.downloadFilePiece(localPath,fileName,i);
+			output.write(pieceData);
+		}
+		output.close();
 	}
 }

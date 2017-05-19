@@ -5,20 +5,22 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONObject;
 
 import com.gearreald.tullfileclient.Environment;
 
 import net.tullco.tullutils.NetworkUtils;
+import net.tullco.tullutils.Pair;
 
 public class ServerConnection {
 	
 	private static final String LIST_URL = "list/";
 	private static final String UPLOAD_URL = "upload/";
+	private static final String DOWNLOAD_URL = "download/";
 	private static final String AUTH_URL = "";
 	
 	private static final int CHUNK_SIZE = 2097152;
+	private static final int DOWNLOAD_RETRIES = 3;
 	
 	public static boolean checkKey() throws MalformedURLException, IOException{
 		NetworkUtils.getDataFromURL(
@@ -28,6 +30,7 @@ public class ServerConnection {
 				,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
 		return true;
 	}
+	
 	public static JSONObject getFileListing(TullFolder f) throws IOException{
 		JSONObject request = new JSONObject();
 		request.put("directory", f.getLocalPath());
@@ -39,10 +42,28 @@ public class ServerConnection {
 				,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
 		return new JSONObject(response);
 	}
-	public static File downloadFile(TullFile f){
+	
+	public static byte[] downloadFilePiece(String localPath, String fileName, int piece) throws IOException {
+		int attempts = 0;
+		while(true){
+			try{
+				byte[] data = NetworkUtils.getBinaryDataFromURL(
+						getURLFor("DOWNLOAD")
+						,false
+						,NetworkUtils.GET
+						,Pair.<String,String>of("localPath",localPath)
+						,Pair.<String,String>of("fileName",fileName)
+						,Pair.<String,String>of("pieceNumber",Integer.toString(piece)));
+				return data;
+			}catch(IOException e){
+				attempts++;
+				if(attempts > DOWNLOAD_RETRIES)
+					throw e;
+			}
+		}
 		//TODO Need to download files at some point. (wasntme)
-		return null;
 	}
+	
 	public static void uploadFile(File file, String filePath, String fileName) throws IOException{
 		byte[] byteBuffer = new byte[CHUNK_SIZE];
 		FileInputStream f = new FileInputStream(file);
@@ -58,6 +79,7 @@ public class ServerConnection {
 			f.close();
 		}
 	}
+	
 	public static JSONObject sendByteStream(
 			byte[] byteBuffer
 			,int bytesInBuffer
@@ -75,6 +97,7 @@ public class ServerConnection {
 				,Pair.<String,String>of("fileName", fileName));
 		return new JSONObject(response);
 	}
+	
 	private static String getURLFor(String location){
 		String baseURL = Environment.getConfiguration(("HOSTNAME"));
 		if(!baseURL.endsWith("/"))
@@ -86,8 +109,10 @@ public class ServerConnection {
 				return baseURL + AUTH_URL;
 			case "UPLOAD":
 				return baseURL + UPLOAD_URL;
+			case "DOWNLOAD":
+				return baseURL + DOWNLOAD_URL;
 			default:
-				return baseURL;
+				throw new RuntimeException("That URL doesn't exist...");
 		}
 	}
 }

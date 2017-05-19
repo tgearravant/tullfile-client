@@ -1,7 +1,10 @@
 package com.gearreald.tullfileclient.controllers;
 
+import com.gearreald.tullfileclient.job.DownloadTullFile;
+import com.gearreald.tullfileclient.job.Job;
 import com.gearreald.tullfileclient.models.TullFile;
 import com.gearreald.tullfileclient.utils.ImageUtils;
+import com.gearreald.tullfileclient.worker.WorkerQueues;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -26,6 +29,7 @@ public class FileViewController {
 	public void initialize(){
 	}
 	public void downloadFile(ActionEvent e){
-		this.f.downloadFile();
+		Job downloadJob = new DownloadTullFile(this.f);
+		WorkerQueues.addJobToQueue("download", downloadJob);
 	}
 }
