@@ -3,13 +3,17 @@ package com.gearreald.tullfileclient.models;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import org.json.JSONObject;
 public class TullFile {
 	
 	private String name;
 	private TullFolder parent;
+	private int pieces;
 	
-	public TullFile(String name,TullFolder parent){
-		this.name=name;
+	public TullFile(JSONObject json,TullFolder parent){
+		this.name=json.getString("name");
+		this.pieces = json.getInt("pieces");
 		this.parent=parent;
 	}
 	public String getName(){
@@ -22,7 +26,7 @@ public class TullFile {
 		return this.parent.getLocalPath();
 	}
 	public int getPieces(){
-		return 13;
+		return this.pieces;
 	}
 	public void downloadFile() throws IOException{
 		File f=new File("C:/Users/tgearr34/TullFile/test.txt");

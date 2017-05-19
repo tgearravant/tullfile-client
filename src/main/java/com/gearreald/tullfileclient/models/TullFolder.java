@@ -65,7 +65,7 @@ public class TullFolder {
 		JSONArray folderArray = json.getJSONArray("subfolders");
 		for(int i=0;i<fileArray.length();i++){
 			JSONObject fileJSON = fileArray.getJSONObject(i);
-			this.files.add(new TullFile(fileJSON.getString("name"),this));
+			this.files.add(new TullFile(fileJSON,this));
 		}
 		for(int i=0;i<folderArray.length();i++){
 			String folderName = folderArray.getString(i);

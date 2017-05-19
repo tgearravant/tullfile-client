@@ -61,7 +61,6 @@ public class ServerConnection {
 					throw e;
 			}
 		}
-		//TODO Need to download files at some point. (wasntme)
 	}
 	
 	public static void uploadFile(File file, String filePath, String fileName) throws IOException{

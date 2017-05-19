@@ -72,7 +72,6 @@ public class TullFileClient extends Application {
 		
         Environment.initializeWorkers();
         Environment.startWorkers();
-		// TODO Auto-generated method stub
 		
 	}
 	@Override

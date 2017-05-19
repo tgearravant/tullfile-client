@@ -49,7 +49,8 @@ public class InterfaceController {
 	@FXML public void uploadFile(ActionEvent event){
 		FileChooser chooser = new FileChooser();
 		File file = chooser.showOpenDialog(borderPane.getScene().getWindow());
-		WorkerQueues.addJobToQueue("upload", new UploadFile(file,current.getLocalPath(),file.getName()));
+		if(file!=null)
+			WorkerQueues.addJobToQueue("upload", new UploadFile(file,current.getLocalPath(),file.getName()));
 	}
 	public void setDisplayFolder(TullFolder f,boolean forceRefresh){
 		this.current=f;
