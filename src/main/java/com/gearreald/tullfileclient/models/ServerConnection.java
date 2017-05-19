@@ -47,8 +47,8 @@ public class ServerConnection {
 		byte[] byteBuffer = new byte[CHUNK_SIZE];
 		FileInputStream f = new FileInputStream(file);
 		try{
-			for(int i=1; f.read(byteBuffer)!=-1; i++){
-				int bytesInBuffer = f.read(byteBuffer);
+			int bytesInBuffer=0;
+			for(int i=1; (bytesInBuffer = f.read(byteBuffer))!=-1; i++){
 				JSONObject json = sendByteStream(byteBuffer, bytesInBuffer, i, filePath, fileName);
 				if(json.getString("status").equals("failure")){
 					throw new IOException("Upload failed.");
@@ -64,11 +64,12 @@ public class ServerConnection {
 			,int pieceNumber
 			,String filePath
 			,String fileName) throws MalformedURLException, IOException {
-		String response = NetworkUtils.sendDataToURL(
+		String response = NetworkUtils.sendBinaryDataToURL(
 				getURLFor("UPLOAD")
 				,false
 				,NetworkUtils.POST
-				,"LOL"
+				,byteBuffer
+				,bytesInBuffer
 				,Pair.<String,String>of("pieceNumber", Integer.toString(pieceNumber))
 				,Pair.<String,String>of("localPath", filePath)
 				,Pair.<String,String>of("fileName", fileName));

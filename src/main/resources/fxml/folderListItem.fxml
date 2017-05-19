@@ -18,4 +18,7 @@
     <ImageView fx:id="iconImage"
     	fitHeight="25.0" fitWidth="25.0"
     	GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+    <Button fx:id="openButton"
+    	text="Open"
+    	GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 </GridPane>

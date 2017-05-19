@@ -19,7 +19,7 @@
     	fitHeight="25.0" fitWidth="25.0"
     	GridPane.columnIndex="0" GridPane.rowIndex="1"/>
     <Text fx:id="pieceLabel"
-    	GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+    	GridPane.columnIndex="2" GridPane.rowIndex="0"/>
     <Button fx:id="downloadButton" onAction="#downloadFile"
     	text="Download"
     	GridPane.columnIndex="1" GridPane.rowIndex="1"/>
