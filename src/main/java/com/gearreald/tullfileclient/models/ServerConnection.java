@@ -17,6 +17,9 @@ public class ServerConnection {
 	private static final String LIST_URL = "list/";
 	private static final String UPLOAD_URL = "upload/";
 	private static final String DOWNLOAD_URL = "download/";
+	private static final String NEW_FOLDER_URL="new/";
+	private final static String DELETE_FOLDER_URL="delete_folder/";
+	private final static String DELETE_FILE_URL="delete_file/";
 	private static final String AUTH_URL = "";
 	
 	private static final int CHUNK_SIZE = 2097152;
@@ -43,6 +46,56 @@ public class ServerConnection {
 		return new JSONObject(response);
 	}
 	
+	public static boolean deleteFolder(TullFolder f) throws IOException{
+		JSONObject request = new JSONObject();
+		request.put("directory", f.getLocalPath());
+		String response = NetworkUtils.sendDataToURL(
+				getURLFor("DELETE_FOLDER")
+				,false
+				,NetworkUtils.DELETE
+				,request.toString()
+				,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
+		if((new JSONObject(response).get("message")).equals("success")){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public static boolean deleteFile(TullFile f) throws IOException{
+		JSONObject request = new JSONObject();
+		request.put("directory", f.getLocalPath());
+		request.put("name", f.getName());
+		String response = NetworkUtils.sendDataToURL(
+				getURLFor("DELETE_FILE")
+				,false
+				,NetworkUtils.DELETE
+				,request.toString()
+				,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
+		if((new JSONObject(response).get("message")).equals("success")){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public static boolean createNewFolder(TullFolder f, String name) throws IOException{
+		JSONObject request = new JSONObject();
+		request.put("directory", f.getLocalPath());
+		request.put("name", name);
+		String response = NetworkUtils.sendDataToURL(
+				getURLFor("NEW_FOLDER")
+				,false
+				,NetworkUtils.POST
+				,request.toString()
+				,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
+		if((new JSONObject(response).get("message")).equals("success")){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
 	public static byte[] downloadFilePiece(String localPath, String fileName, int piece) throws IOException {
 		int attempts = 0;
 		while(true){
@@ -53,7 +106,8 @@ public class ServerConnection {
 						,NetworkUtils.GET
 						,Pair.<String,String>of("localPath",localPath)
 						,Pair.<String,String>of("fileName",fileName)
-						,Pair.<String,String>of("pieceNumber",Integer.toString(piece)));
+						,Pair.<String,String>of("pieceNumber",Integer.toString(piece))
+						,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
 				return data;
 			}catch(IOException e){
 				attempts++;
@@ -79,7 +133,7 @@ public class ServerConnection {
 		}
 	}
 	
-	public static JSONObject sendByteStream(
+	private static JSONObject sendByteStream(
 			byte[] byteBuffer
 			,int bytesInBuffer
 			,int pieceNumber
@@ -93,7 +147,8 @@ public class ServerConnection {
 				,bytesInBuffer
 				,Pair.<String,String>of("pieceNumber", Integer.toString(pieceNumber))
 				,Pair.<String,String>of("localPath", filePath)
-				,Pair.<String,String>of("fileName", fileName));
+				,Pair.<String,String>of("fileName", fileName)
+				,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
 		return new JSONObject(response);
 	}
 	
@@ -110,6 +165,12 @@ public class ServerConnection {
 				return baseURL + UPLOAD_URL;
 			case "DOWNLOAD":
 				return baseURL + DOWNLOAD_URL;
+			case "NEW_FOLDER":
+				return baseURL + NEW_FOLDER_URL;
+			case "DELETE_FOLDER":
+				return baseURL + DELETE_FOLDER_URL;
+			case "DELETE_FILE":
+				return baseURL + DELETE_FILE_URL;
 			default:
 				throw new RuntimeException("That URL doesn't exist...");
 		}

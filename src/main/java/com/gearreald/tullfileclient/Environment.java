@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.gearreald.tullfileclient.controllers.InterfaceController;
 import com.gearreald.tullfileclient.worker.Worker;
 
+import javafx.stage.Stage;
 import net.tullco.tullutils.NullUtils;
 
 public class Environment {
@@ -17,6 +19,9 @@ public class Environment {
 	private static HashMap<String,String> configuration = new HashMap<String,String>();
 	
 	private static Set<Worker> workerList = ConcurrentHashMap.<Worker>newKeySet();
+	
+	private static Stage primaryStage;
+	private static InterfaceController interfaceController;
 	
 	public static void setConfiguration(String key, String value){
 		configuration.put(key, value);
@@ -60,5 +65,17 @@ public class Environment {
 		for(Worker w: workerList){
 			w.noMore();
 		}
+	}
+	public static void setPrimaryStage(Stage stage){
+		primaryStage = stage;
+	}
+	public static Stage getPrimaryStage(){
+		return primaryStage;
+	}
+	public static void setInterfaceController(InterfaceController c){
+		interfaceController=c;
+	}
+	public static InterfaceController getInterfaceController(){
+		return interfaceController;
 	}
 }

@@ -69,6 +69,7 @@ public class TullFileClient extends Application {
 		primaryStage.setScene(scene);
 		
         primaryStage.show();
+        Environment.setPrimaryStage(primaryStage);
 		
         Environment.initializeWorkers();
         Environment.startWorkers();

@@ -35,9 +35,9 @@ public class TullFolder {
 	}
 	public String getLocalPath(){
 		if(this.parent==null){
-			return this.getName();
+			return "/";
 		}
-		return this.parent.getLocalPath()+this.getName();
+		return this.parent.getLocalPath()+this.getName()+"/";
 	}
 	public List<TullFolder> getSubfolders() {
 		return this.subfolders;
@@ -45,7 +45,7 @@ public class TullFolder {
 	public List<TullFile> getFiles(){
 		return this.files;
 	}
-	public void fetchFolderData(boolean force) throws IOException{
+	public synchronized void fetchFolderData(boolean force) throws IOException{
 		if(this.fetched&&!force)
 			return;
 		if(this.fetched){
@@ -53,7 +53,6 @@ public class TullFolder {
 			this.files.clear();
 		}
 		JSONObject folderJSON = ServerConnection.getFileListing(this);
-		System.out.println(folderJSON);
 		fromJSON(folderJSON.getJSONObject("response"));
 		for(TullFolder folder: this.subfolders){
 			WorkerQueues.addJobToQueue("quick", new LoadTullFolderData(folder));
@@ -71,5 +70,14 @@ public class TullFolder {
 			String folderName = folderArray.getString(i);
 			this.subfolders.add(new TullFolder(folderName,this));
 		}
+	}
+	public TullFolder getParentFolder(){
+		return this.parent;
+	}
+	public TullFolder getRootFolder(){
+		TullFolder folder = this;
+		while(folder.getParentFolder()!=null)
+			folder=folder.getParentFolder();
+		return folder;
 	}
 }

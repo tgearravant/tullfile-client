@@ -12,6 +12,9 @@ public class TullFile {
 	private int pieces;
 	
 	public TullFile(JSONObject json,TullFolder parent){
+		if(parent==null){
+			ErrorDialogBox.dialogFor(new RuntimeException("A Tullfile must have a parent."));
+		}
 		this.name=json.getString("name");
 		this.pieces = json.getInt("pieces");
 		this.parent=parent;
@@ -20,9 +23,6 @@ public class TullFile {
 		return this.name;
 	}
 	public String getLocalPath(){
-		if(this.parent==null){
-			return "/";
-		}
 		return this.parent.getLocalPath();
 	}
 	public int getPieces(){

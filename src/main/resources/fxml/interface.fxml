@@ -21,6 +21,15 @@
 	</center>
 	<bottom>
 		<HBox>
+			<Button fx:id="homeButton"
+				text="Home"
+				onAction="#toHomeFolder"/>
+			<Button fx:id="backButton"
+				text="Back"
+				onAction="#toHomeFolder"/>
+			<Button fx:id="newFolderButton"
+				text="Create New Folder"
+				onAction="#createNewFolder"/>
 			<Button fx:id="uploadButton"
 				text="Upload New File"
 				onAction="#uploadFile"/>

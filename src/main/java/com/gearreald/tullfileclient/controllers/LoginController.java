@@ -76,7 +76,7 @@ public class LoginController {
 			e.printStackTrace();
 			return;
 		}
-    	Stage stage = (Stage) actionTarget.getScene().getWindow();
+    	Stage stage = Environment.getPrimaryStage();
 		Scene scene = new Scene(root,600,400);
     	stage.setScene(scene);
     }
