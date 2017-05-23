@@ -3,6 +3,7 @@ package com.gearreald.tullfileclient.models;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -39,7 +40,9 @@ public class ErrorDialogBox extends Alert {
 		this.getDialogPane().setExpandableContent(expContent);
 	}
 	public static void dialogFor(Exception e){
-		ErrorDialogBox box = new ErrorDialogBox(e);
-		box.showAndWait();
+		Platform.runLater(() ->{
+			new ErrorDialogBox(e).show();
+			
+		});
 	}
 }
