@@ -42,7 +42,6 @@ public class ErrorDialogBox extends Alert {
 	public static void dialogFor(Exception e){
 		Platform.runLater(() ->{
 			new ErrorDialogBox(e).show();
-			e.printStackTrace();
 		});
 	}
 }
