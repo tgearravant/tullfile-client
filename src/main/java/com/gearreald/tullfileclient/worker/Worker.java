@@ -4,6 +4,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.gearreald.tullfileclient.job.Job;
+import com.gearreald.tullfileclient.models.ErrorDialogBox;
 
 public class Worker extends Thread {
 	
@@ -35,7 +36,7 @@ public class Worker extends Thread {
 				System.err.println("Worker on queue "+queueName+" has failed.\nMessage: "+e.getMessage());
 				WorkerQueues.addJobToQueue(this.queueName, job);
 			}catch (HardStopException e) {
-				System.err.println(e.getMessage());
+				ErrorDialogBox.dialogFor(e);
 			}catch(Exception e){
 				e.printStackTrace();
 			}

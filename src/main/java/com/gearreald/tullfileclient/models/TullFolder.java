@@ -52,7 +52,7 @@ public class TullFolder {
 			this.subfolders.clear();
 			this.files.clear();
 		}
-		JSONObject folderJSON = ServerConnection.getFileListing(this);
+		JSONObject folderJSON = ServerConnection.getFileListing(this.getLocalPath());
 		fromJSON(folderJSON.getJSONObject("response"));
 		for(TullFolder folder: this.subfolders){
 			WorkerQueues.addJobToQueue("quick", new LoadTullFolderData(folder));

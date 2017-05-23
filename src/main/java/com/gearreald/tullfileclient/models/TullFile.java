@@ -3,6 +3,10 @@ package com.gearreald.tullfileclient.models;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+import javax.xml.bind.DatatypeConverter;
 
 import org.json.JSONObject;
 public class TullFile {
@@ -35,6 +39,17 @@ public class TullFile {
 		FileOutputStream output = new FileOutputStream(f);
 		for(int i=1;i<=this.getPieces();i++){
 			byte[] pieceData = ServerConnection.downloadFilePiece(localPath,fileName,i);
+			String pieceHash;
+			try {
+				pieceHash = DatatypeConverter.printHexBinary(MessageDigest.getInstance("SHA-1").digest(pieceData));
+				String serverHash = ServerConnection.getFilePieceHash(localPath, fileName, i);
+				if(!pieceHash.equals(serverHash)){
+					i--;
+					ErrorDialogBox.dialogFor(new Exception("Hash mismatch. Server: "+serverHash+" Local: "+pieceHash));
+				}
+			} catch (NoSuchAlgorithmException e) {
+				ErrorDialogBox.dialogFor(e);
+			}
 			output.write(pieceData);
 		}
 		output.close();

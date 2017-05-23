@@ -21,7 +21,6 @@ public class UploadFile extends Job {
 		this.done=false;
 	}
 	public void work() throws WorkerException{
-		System.out.println("Let's Go!");
 		try {
 			ServerConnection.uploadFile(file, remotePath, fileName);
 		} catch (IOException e) {

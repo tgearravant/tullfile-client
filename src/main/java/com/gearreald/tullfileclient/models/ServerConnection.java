@@ -2,9 +2,11 @@ package com.gearreald.tullfileclient.models;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.gearreald.tullfileclient.Environment;
@@ -21,6 +23,7 @@ public class ServerConnection {
 	private final static String DELETE_FOLDER_URL="delete_folder/";
 	private final static String DELETE_FILE_URL="delete_file/";
 	private static final String AUTH_URL = "";
+	private static final String VERIFY_PIECE_URL = "verify/";
 	
 	private static final int CHUNK_SIZE = 2097152;
 	private static final int DOWNLOAD_RETRIES = 3;
@@ -34,9 +37,9 @@ public class ServerConnection {
 		return true;
 	}
 	
-	public static JSONObject getFileListing(TullFolder f) throws IOException{
+	public static JSONObject getFileListing(String localPath) throws IOException{
 		JSONObject request = new JSONObject();
-		request.put("directory", f.getLocalPath());
+		request.put("directory", localPath);
 		String response = NetworkUtils.sendDataToURL(
 				getURLFor("LIST")
 				,false
@@ -45,10 +48,25 @@ public class ServerConnection {
 				,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
 		return new JSONObject(response);
 	}
-	
-	public static boolean deleteFolder(TullFolder f) throws IOException{
+	public static String getFilePieceHash(String localPath, String name, int piece) throws IOException{
+		String response = NetworkUtils.getDataFromURL(
+				getURLFor("VERIFY_PIECE")
+				,false
+				,NetworkUtils.GET
+				,Pair.<String,String>of("localPath",localPath)
+				,Pair.<String,String>of("fileName",name)
+				,Pair.<String,String>of("pieceNumber",Integer.toString(piece))
+				,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
+		JSONObject responseJSON = new JSONObject(response);
+		try{
+			return responseJSON.getString("piece_hash");
+		}catch(JSONException e){
+			throw new FileNotFoundException(responseJSON.getString("message"));
+		}
+	}
+	public static boolean deleteFolder(String localPath) throws IOException{
 		JSONObject request = new JSONObject();
-		request.put("directory", f.getLocalPath());
+		request.put("directory", localPath);
 		String response = NetworkUtils.sendDataToURL(
 				getURLFor("DELETE_FOLDER")
 				,false
@@ -62,10 +80,10 @@ public class ServerConnection {
 		}
 	}
 	
-	public static boolean deleteFile(TullFile f) throws IOException{
+	public static boolean deleteFile(String localPath, String name) throws IOException{
 		JSONObject request = new JSONObject();
-		request.put("directory", f.getLocalPath());
-		request.put("name", f.getName());
+		request.put("directory", localPath);
+		request.put("name", name);
 		String response = NetworkUtils.sendDataToURL(
 				getURLFor("DELETE_FILE")
 				,false
@@ -79,9 +97,9 @@ public class ServerConnection {
 		}
 	}
 	
-	public static boolean createNewFolder(TullFolder f, String name) throws IOException{
+	public static boolean createNewFolder(String localPath, String name) throws IOException{
 		JSONObject request = new JSONObject();
-		request.put("directory", f.getLocalPath());
+		request.put("directory", localPath);
 		request.put("name", name);
 		String response = NetworkUtils.sendDataToURL(
 				getURLFor("NEW_FOLDER")
@@ -171,6 +189,8 @@ public class ServerConnection {
 				return baseURL + DELETE_FOLDER_URL;
 			case "DELETE_FILE":
 				return baseURL + DELETE_FILE_URL;
+			case "VERIFY_PIECE":
+				return baseURL + VERIFY_PIECE_URL;
 			default:
 				throw new RuntimeException("That URL doesn't exist...");
 		}

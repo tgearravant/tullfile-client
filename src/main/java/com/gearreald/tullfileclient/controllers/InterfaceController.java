@@ -116,7 +116,7 @@ public class InterfaceController {
 		if (result.isPresent()){
 			String newFolderName = result.get();
 			try {
-				ServerConnection.createNewFolder(current, newFolderName);
+				ServerConnection.createNewFolder(current.getLocalPath(), newFolderName);
 			} catch (IOException e) {
 				ErrorDialogBox.dialogFor(e);
 			}
