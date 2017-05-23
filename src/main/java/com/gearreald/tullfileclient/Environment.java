@@ -14,7 +14,7 @@ public class Environment {
 	
 	private static final int UPLOAD_WORKERS=1;
 	private static final int DOWNLOAD_WORKERS=2;
-	private static final int QUICK_WORKERS=2;
+	private static final int QUICK_WORKERS=5;
 	
 	private static HashMap<String,String> configuration = new HashMap<String,String>();
 	

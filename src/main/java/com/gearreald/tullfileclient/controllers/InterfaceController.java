@@ -57,7 +57,7 @@ public class InterfaceController {
 	}
 	@FXML private void uploadFile(ActionEvent event){
 		FileChooser chooser = new FileChooser();
-		File file = chooser.showOpenDialog(borderPane.getScene().getWindow());
+		File file = chooser.showOpenDialog(Environment.getPrimaryStage());
 		if(file!=null)
 			WorkerQueues.addJobToQueue("upload", new UploadFile(file,current.getLocalPath(),file.getName()));
 	}

@@ -30,6 +30,8 @@ public class Worker extends Thread {
 					WorkerQueues.attemptJob(job);
 					job.work();
 				}
+				if(!job.completed())
+					WorkerQueues.addJobToQueue(this.queueName, job);
 			}catch (InterruptedException e) {
 				this.noMore();
 			}catch(WorkerException e){
@@ -38,7 +40,7 @@ public class Worker extends Thread {
 			}catch (HardStopException e) {
 				ErrorDialogBox.dialogFor(e);
 			}catch(Exception e){
-				e.printStackTrace();
+				ErrorDialogBox.dialogFor(e);
 			}
 		}
 	}
