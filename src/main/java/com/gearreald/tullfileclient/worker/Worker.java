@@ -30,7 +30,7 @@ public class Worker extends Thread {
 					WorkerQueues.attemptJob(job);
 					job.work();
 				}
-				if(!job.completed())
+				if(job!= null && !job.completed())
 					WorkerQueues.addJobToQueue(this.queueName, job);
 			}catch (InterruptedException e) {
 				this.noMore();

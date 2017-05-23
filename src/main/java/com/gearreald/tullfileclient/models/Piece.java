@@ -50,6 +50,9 @@ public class Piece implements Comparable<Piece> {
 		}
 		return this.verified();
 	}
+	public boolean deletePiece() {
+		return this.pieceFile.delete();
+	}
 	
 	@Override
 	public int hashCode() {

@@ -79,6 +79,12 @@ public class TullFile {
 			output.write(p.getData());
 		}
 		output.close();
+		cleanUpAllPieces();
+	}
+	public void cleanUpAllPieces(){
+		for(Piece p: this.pieceList){
+			p.deletePiece();
+		}
 	}
 	public void downloadFile() throws IOException{
 		File f=new File("C:/Users/tgearr34/TullFile/test.txt");

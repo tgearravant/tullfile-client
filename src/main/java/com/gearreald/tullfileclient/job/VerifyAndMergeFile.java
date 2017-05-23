@@ -24,7 +24,6 @@ public class VerifyAndMergeFile extends Job {
 		if(!this.file.allPiecesValid()) {
 			this.file.trashInvalidPieces();
 		}else{
-			// TODO I need to come up with some kind of solution for files like this...
 			try{
 				this.file.mergePieces(this.destination);
 				this.done=true;
