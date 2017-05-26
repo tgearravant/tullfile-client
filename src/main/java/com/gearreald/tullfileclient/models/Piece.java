@@ -32,6 +32,9 @@ public class Piece implements Comparable<Piece> {
 	public boolean invalid(){
 		return this.invalid;
 	}
+	public int getPieceNumber(){
+		return this.pieceNumber;
+	}
 	public boolean verifyPiece() throws IOException{
 		try{
 			String serverHash =

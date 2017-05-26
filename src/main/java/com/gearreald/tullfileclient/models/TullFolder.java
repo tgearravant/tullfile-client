@@ -71,6 +71,15 @@ public class TullFolder {
 			this.subfolders.add(new TullFolder(folderName,this));
 		}
 	}
+	public boolean delete(){
+		try {
+			ServerConnection.deleteFolder(this.getLocalPath());
+			return true;
+		} catch (IOException e) {
+			ErrorDialogBox.dialogFor(e);
+			return false;
+		}
+	}
 	public TullFolder getParentFolder(){
 		return this.parent;
 	}

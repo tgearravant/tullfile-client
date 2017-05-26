@@ -23,11 +23,15 @@ public class Worker extends Thread {
 	public void run() {
 		while(keepRunning.get()){
 			Job job = WorkerQueues.getJobFromQueue(this.queueName);
+			//The worker will attempt the job from it's queue.
 			try{
-				if(job==null || WorkerQueues.attempted(job))
+				if(job==null || job.attempted()) {
+					if(job!=null){
+					}
 					Thread.sleep(1000);
+				}
 				if(job!=null){
-					WorkerQueues.attemptJob(job);
+					System.out.println("Worker: "+this.getUUID()+" starting job: "+job.getJobName());
 					job.work();
 				}
 				if(job!= null && !job.completed())
@@ -35,6 +39,7 @@ public class Worker extends Thread {
 			}catch (InterruptedException e) {
 				this.noMore();
 			}catch(WorkerException e){
+				WorkerQueues.failJob(job);
 				System.err.println("Worker on queue "+queueName+" has failed.\nMessage: "+e.getMessage());
 				WorkerQueues.addJobToQueue(this.queueName, job);
 			}catch (HardStopException e) {

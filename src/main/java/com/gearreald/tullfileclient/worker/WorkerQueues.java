@@ -24,18 +24,17 @@ public class WorkerQueues {
 	 * @param job The job to be attempted.
 	 * @throws HardStopException This is thrown when the job should no longer be attempted.
 	 */
-	public static void attemptJob(Job job) throws HardStopException{
+	public static void failJob(Job job) {
 		if(!jobAttempts.containsKey(job))
 			jobAttempts.put(job, 0);
 		int currentAttempts = jobAttempts.get(job);
 		if(currentAttempts >= job.getRetries()){
 			failedJobs.add(job);
-			throw new HardStopException("Job "+job.getJobName()+" has failed too many times. Trashing.");
 		}
 		jobAttempts.put(job,currentAttempts+1);
 	}
 	
-	public static boolean attempted(Job job){
+	public static boolean failed(Job job){
 		if(job==null)
 			return false;
 		Integer attempts = jobAttempts.get(job);
@@ -43,7 +42,14 @@ public class WorkerQueues {
 			return false;
 		return true;
 	}
-	
+	public static int failCount(Job job){
+		if(job==null)
+			return 0;
+		Integer attempts = jobAttempts.get(job);
+		if(attempts==null)
+			return 0;
+		return attempts;
+	}
 	public static void addJobToQueue(String queueName, Job job){
 		getQueue(queueName).add(job);
 	}

@@ -2,6 +2,7 @@ package com.gearreald.tullfileclient.controllers;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import com.gearreald.tullfileclient.Environment;
@@ -10,6 +11,8 @@ import com.gearreald.tullfileclient.models.ErrorDialogBox;
 import com.gearreald.tullfileclient.models.ServerConnection;
 import com.gearreald.tullfileclient.models.TullFile;
 import com.gearreald.tullfileclient.models.TullFolder;
+import com.gearreald.tullfileclient.utils.ResourceLoader;
+import com.gearreald.tullfileclient.utils.SystemUtils;
 import com.gearreald.tullfileclient.worker.WorkerQueues;
 
 import javafx.application.Platform;
@@ -22,7 +25,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 
@@ -30,7 +32,7 @@ public class InterfaceController {
 
 	@FXML public BorderPane borderPane;
 	@FXML public Text header;
-	@FXML public ListView<GridPane> fileList;
+	@FXML public ListView<BorderPane> fileList;
 	@FXML public Button homeButton;
 	@FXML public Button backButton;
 	@FXML public Button newFolderButton;
@@ -38,7 +40,7 @@ public class InterfaceController {
 	@FXML public Button exitButton;
 	@FXML public Button uploadButton;
 	
-	public ObservableList<GridPane> boxList = FXCollections.<GridPane>observableArrayList();
+	public ObservableList<BorderPane> boxList = FXCollections.<BorderPane>observableArrayList();
 	
 	public TullFolder current;
 	
@@ -52,14 +54,25 @@ public class InterfaceController {
 	@FXML private void exitApplication(ActionEvent event){
 		Platform.exit();
 	}
-	@FXML private void refreshFolder(ActionEvent event){
-		this.setDisplayFolder(this.current,true);
+	@FXML public void refreshFolder(ActionEvent event){
+		this.refreshCurrentFolder();
 	}
 	@FXML private void uploadFile(ActionEvent event){
 		FileChooser chooser = new FileChooser();
-		File file = chooser.showOpenDialog(Environment.getPrimaryStage());
-		if(file!=null)
-			WorkerQueues.addJobToQueue("upload", new UploadFile(file,current.getLocalPath(),file.getName()));
+		chooser.setInitialDirectory(new File (SystemUtils.getUserDirectory()));
+		List<File> files = chooser.showOpenMultipleDialog(Environment.getPrimaryStage());
+		if(files!=null){
+			for(File file: files){
+				if(file.isDirectory()){
+					ErrorDialogBox.dialogFor(new Exception("Cannot currently upload directories."));
+				}else{
+					WorkerQueues.addJobToQueue("upload", new UploadFile(file,current.getLocalPath(),file.getName()));
+				}
+			}
+		}
+	}
+	public void refreshCurrentFolder(){
+		this.setDisplayFolder(this.current, true);
 	}
 	public void setDisplayFolder(TullFolder f){
 		setDisplayFolder(f,false);
@@ -72,15 +85,16 @@ public class InterfaceController {
 			ErrorDialogBox.dialogFor(e);
 		}
 		this.boxList.clear();
+		for(TullFolder subfolder : this.current.getSubfolders()){
+			addTullFolder(subfolder);
+		}
 		for(TullFile file : this.current.getFiles())
 			addTullFile(file);
-		for(TullFolder subfolder : this.current.getSubfolders())
-			addTullFolder(subfolder);
 	}
 	private void addTullFile(TullFile f){
-		FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/fileListItem.fxml"));
+		FXMLLoader loader = new FXMLLoader(ResourceLoader.getResourceURL("fxml/fileListItem.fxml"));
 		try {
-			boxList.add(loader.<GridPane>load());
+			boxList.add(loader.<BorderPane>load());
 		} catch (IOException e) {
 			ErrorDialogBox.dialogFor(e);
 		}
@@ -88,9 +102,9 @@ public class InterfaceController {
 		controller.setTullFile(f);
 	}
 	private void addTullFolder(TullFolder f){
-		FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/folderListItem.fxml"));
+		FXMLLoader loader = new FXMLLoader(ResourceLoader.getResourceURL("fxml/folderListItem.fxml"));
 		try {
-			boxList.add(loader.<GridPane>load());
+			boxList.add(loader.<BorderPane>load());
 		} catch (IOException e) {
 			ErrorDialogBox.dialogFor(e);
 		}

@@ -3,17 +3,14 @@ package com.gearreald.tullfileclient.models;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.bind.DatatypeConverter;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.json.JSONObject;
 
 import com.gearreald.tullfileclient.job.DownloadTullFilePiece;
 import com.gearreald.tullfileclient.job.VerifyAndMergeFile;
+import com.gearreald.tullfileclient.job.VerifyPiece;
 import com.gearreald.tullfileclient.worker.WorkerQueues;
 
 import net.tullco.tullutils.FileUtils;
@@ -26,7 +23,7 @@ public class TullFile {
 	private List<Piece> pieceList;
 	
 	public TullFile(JSONObject json,TullFolder parent){
-		pieceList = new ArrayList<Piece>();
+		pieceList = new CopyOnWriteArrayList<Piece>();
 		if(parent==null){
 			ErrorDialogBox.dialogFor(new RuntimeException("A Tullfile must have a parent."));
 		}
@@ -37,11 +34,30 @@ public class TullFile {
 	public String getName(){
 		return this.name;
 	}
+	public String getSuffix(){
+		String fileName = this.getName();
+		int i = fileName.lastIndexOf('.');
+
+		if (i > 0) {
+		    return fileName.substring(i+1);
+		}else{
+			return "*";
+		}
+	}
 	public String getLocalPath(){
 		return this.parent.getLocalPath();
 	}
 	public int getPieceCount(){
 		return this.pieceCount;
+	}
+	public boolean deleteFile(){
+		try {
+			ServerConnection.deleteFile(this.getLocalPath(), this.getName());
+			return true;
+		} catch (IOException e) {
+			ErrorDialogBox.dialogFor(e);
+			return false;
+		}
 	}
 	public boolean allPiecesDownloaded(){
 		return this.pieceList.size()==this.pieceCount;
@@ -64,8 +80,10 @@ public class TullFile {
 		String fileName = this.getName();
 		byte[] pieceData = ServerConnection.downloadFilePiece(localPath,fileName,piece);
 		FileUtils.writeBytesToFile(pieceData, f);
-		this.pieceList.add(new Piece(this, piece, f));
+		Piece p = new Piece(this, piece, f);
+		this.pieceList.add(p);
 		this.pieceList.sort(null);
+		WorkerQueues.addJobToQueue("quick", new VerifyPiece(p));
 	}
 	public void queueAllPiecesForDownload(File downloadLocation){
 		for(int i=1; i<=this.getPieceCount(); i++){
@@ -85,28 +103,6 @@ public class TullFile {
 		for(Piece p: this.pieceList){
 			p.deletePiece();
 		}
-	}
-	public void downloadFile() throws IOException{
-		File f=new File("C:/Users/tgearr34/TullFile/test.txt");
-		String localPath = this.getLocalPath();
-		String fileName = this.getName();
-		FileOutputStream output = new FileOutputStream(f);
-		for(int i=1;i<=this.getPieceCount();i++){
-			byte[] pieceData = ServerConnection.downloadFilePiece(localPath,fileName,i);
-			String pieceHash;
-			try {
-				pieceHash = DatatypeConverter.printHexBinary(MessageDigest.getInstance("SHA-1").digest(pieceData));
-				String serverHash = ServerConnection.getFilePieceHash(localPath, fileName, i);
-				if(!pieceHash.equals(serverHash)){
-					i--;
-					ErrorDialogBox.dialogFor(new RuntimeException("Hash mismatch. Server: "+serverHash+" Local: "+pieceHash));
-				}
-			} catch (NoSuchAlgorithmException e) {
-				ErrorDialogBox.dialogFor(e);
-			}
-			output.write(pieceData);
-		}
-		output.close();
 	}
 	@Override
 	public int hashCode() {

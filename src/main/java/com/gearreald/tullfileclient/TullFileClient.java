@@ -1,5 +1,7 @@
 package com.gearreald.tullfileclient;
 
+import com.gearreald.tullfileclient.utils.ResourceLoader;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -62,10 +64,10 @@ public class TullFileClient extends Application {
         });
         
 		Scene scene = new Scene(grid, 300, 275);*/
-		Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxml/login.fxml"));
+		Parent root = FXMLLoader.load(ResourceLoader.getResourceURL("fxml/login.fxml"));
        
         Scene scene = new Scene(root, 300, 275);
-		scene.getStylesheets().add(getClass().getClassLoader().getResource("css/global.css").toExternalForm());
+		scene.getStylesheets().add(ResourceLoader.getAbsoluteResourcePath("css/global.css"));
 		primaryStage.setScene(scene);
 		
         primaryStage.show();

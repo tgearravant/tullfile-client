@@ -9,6 +9,7 @@ import com.gearreald.tullfileclient.utils.ImageUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -16,23 +17,35 @@ import javafx.stage.FileChooser;
 public class FileViewController {
 	
 	private TullFile f;
-	@FXML private Text titleText;
+	@FXML private Label titleLabel;
 	@FXML private ImageView iconImage;
-	@FXML private Text pieceLabel;
+	@FXML private Label pieceLabel;
+	@FXML private Text pieceText;
+	@FXML private Button deleteButton;
 	@FXML private Button downloadButton;
 	
 	public void setTullFile(TullFile f){
 		this.f=f;
-		this.titleText.setText(this.f.getName());
+		this.titleLabel.setText(this.f.getName());
 		this.iconImage.setImage(ImageUtils.getImage("file-icon.png"));
-		this.pieceLabel.setText(Integer.toString(this.f.getPieceCount()));
+		this.pieceText.setText(Integer.toString(this.f.getPieceCount()));
 	}
 	public void initialize(){
 	}
+	@FXML
 	public void downloadFile(ActionEvent e){
 		FileChooser chooser = new FileChooser();
-		File file = chooser.showOpenDialog(Environment.getPrimaryStage());
+		String suffix = this.f.getSuffix();
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(suffix.toUpperCase()+" files (*."+suffix+")", "*."+suffix+"");
+        chooser.getExtensionFilters().add(extFilter);
+		File file = chooser.showSaveDialog(Environment.getPrimaryStage());
+		
 		if(file!=null)
 			this.f.queueAllPiecesForDownload(file);
+	}
+	@FXML
+	public void deleteFile(ActionEvent e){
+		if(this.f.deleteFile())
+			Environment.getInterfaceController().refreshCurrentFolder();
 	}
 }

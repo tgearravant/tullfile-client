@@ -3,6 +3,8 @@ package com.gearreald.tullfileclient.models;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import com.gearreald.tullfileclient.utils.ResourceLoader;
+
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
@@ -12,6 +14,8 @@ import javafx.scene.layout.Priority;
 
 public class ErrorDialogBox extends Alert {
 
+	private static String STYLESHEET_PATH="css/dialog.css";
+	
 	public ErrorDialogBox(Exception e) {
 		super(AlertType.ERROR);
 		this.setTitle("An Error was encountered.");
@@ -38,6 +42,7 @@ public class ErrorDialogBox extends Alert {
 		expContent.add(label, 0, 0);
 		expContent.add(textArea, 0, 1);
 		this.getDialogPane().setExpandableContent(expContent);
+		this.getDialogPane().getStylesheets().add(ResourceLoader.getAbsoluteResourcePath(STYLESHEET_PATH));
 	}
 	public static void dialogFor(Exception e){
 		Platform.runLater(() ->{
