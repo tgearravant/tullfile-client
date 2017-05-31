@@ -21,7 +21,7 @@ public class VerifyPiece extends Job {
 		this.failPermanently();
 		try {
 			this.piece.verifyPiece();
-			this.done=true;
+			this.done = true;
 		} catch (IOException e) {
 			throw new WorkerException("Failed to verify piece.",e);
 		}

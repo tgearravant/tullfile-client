@@ -3,17 +3,20 @@ package com.gearreald.tullfileclient.models;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.json.JSONObject;
 
 import com.gearreald.tullfileclient.job.DownloadTullFilePiece;
+import com.gearreald.tullfileclient.job.Job;
 import com.gearreald.tullfileclient.job.VerifyAndMergeFile;
 import com.gearreald.tullfileclient.job.VerifyPiece;
 import com.gearreald.tullfileclient.worker.WorkerQueues;
 
 import net.tullco.tullutils.FileUtils;
+import net.tullco.tullutils.StringUtils;
 
 public class TullFile {
 	
@@ -71,16 +74,45 @@ public class TullFile {
 	}
 	public void trashInvalidPieces(){
 		for(Piece p: this.pieceList){
-			if(p.invalid())
+			if(p.invalid()){
 				this.pieceList.remove(p);
+				p.deletePiece();
+				Job j = new DownloadTullFilePiece(this,p.getPieceNumber());
+				WorkerQueues.addJobToQueue("download",j);
+			}
 		}
 	}
-	public void downloadPiece(File f, int piece) throws IOException{
-		String localPath = this.getLocalPath();
-		String fileName = this.getName();
-		byte[] pieceData = ServerConnection.downloadFilePiece(localPath,fileName,piece);
-		FileUtils.writeBytesToFile(pieceData, f);
-		Piece p = new Piece(this, piece, f);
+	public File getPieceFile(int piece){
+		File tempFolder = TempHandler.getTempDirectoryForFile(this.getLocalPath(), this.getName());
+		if(!tempFolder.exists()){
+			tempFolder.mkdirs();
+		}
+		File pieceLocation = new File(StringUtils.assureEndsWith(tempFolder.getAbsolutePath(),"/")+StringUtils.leftPad(Integer.toString(piece), '0', 8));
+		return pieceLocation;
+	}
+	public void deletePiece(int pieceNumber){
+		Iterator<Piece> iterator = this.pieceList.iterator();
+		while(iterator.hasNext()){
+			Piece p = iterator.next();
+			if(p.getPieceNumber()==pieceNumber){
+				p.deletePiece();
+				this.pieceList.remove(p);
+				break;
+			}
+		}
+	}
+	public void downloadPiece(int piece) throws IOException{
+		File pieceLocation = this.getPieceFile(piece);
+		Piece p;
+		if(pieceLocation.exists()){
+			 p = new Piece(this,piece,pieceLocation);
+		}else{
+			String localPath = this.getLocalPath();
+			String fileName = this.getName();
+			byte[] pieceData = ServerConnection.downloadFilePiece(localPath,fileName,piece);
+			FileUtils.writeBytesToFile(pieceData, pieceLocation);
+			p = new Piece(this, piece, pieceLocation);
+		}
 		this.pieceList.add(p);
 		this.pieceList.sort(null);
 		WorkerQueues.addJobToQueue("quick", new VerifyPiece(p));
@@ -91,18 +123,32 @@ public class TullFile {
 		}
 		WorkerQueues.addJobToQueue("quick", new VerifyAndMergeFile(this,downloadLocation));
 	}
+	public void reverifyPieces(){
+		for(Piece p: this.pieceList){
+			p.scheduleReverifyPiece();
+		}
+	}
+	public String getFileHash(){
+		try{
+			String s = ServerConnection.getFileHash(this.getLocalPath(), this.getName());
+			return s;
+		}catch(IOException e){
+			ErrorDialogBox.dialogFor(e);
+			return null;
+		}
+	}
 	public void mergePieces(File f) throws IOException{
 		FileOutputStream output = new FileOutputStream(f);
 		for(Piece p: this.pieceList){
 			output.write(p.getData());
 		}
 		output.close();
-		cleanUpAllPieces();
 	}
 	public void cleanUpAllPieces(){
 		for(Piece p: this.pieceList){
 			p.deletePiece();
 		}
+		this.pieceList.clear();
 	}
 	@Override
 	public int hashCode() {

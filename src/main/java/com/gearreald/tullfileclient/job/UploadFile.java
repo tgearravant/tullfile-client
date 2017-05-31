@@ -2,6 +2,7 @@ package com.gearreald.tullfileclient.job;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 import com.gearreald.tullfileclient.Environment;
 import com.gearreald.tullfileclient.models.ServerConnection;
@@ -9,6 +10,7 @@ import com.gearreald.tullfileclient.worker.HardStopException;
 import com.gearreald.tullfileclient.worker.WorkerException;
 
 import javafx.application.Platform;
+import net.tullco.tullutils.FileUtils;
 
 public class UploadFile extends Job {
 	private static final String JOB_NAME="UploadFile";
@@ -28,7 +30,8 @@ public class UploadFile extends Job {
 		this.failPermanently();
 		try {
 			ServerConnection.uploadFile(file, remotePath, fileName);
-		} catch (IOException e) {
+			ServerConnection.setFileHash(this.remotePath, this.fileName, FileUtils.sha1Hash(this.file));
+		} catch (IOException | NoSuchAlgorithmException e) {
 			e.printStackTrace();
 			throw new WorkerException(e);
 		}

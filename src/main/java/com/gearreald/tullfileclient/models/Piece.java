@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
+import com.gearreald.tullfileclient.job.VerifyPiece;
+import com.gearreald.tullfileclient.worker.WorkerQueues;
+
 import net.tullco.tullutils.FileUtils;
 
 public class Piece implements Comparable<Piece> {
@@ -28,6 +31,10 @@ public class Piece implements Comparable<Piece> {
 	}
 	public boolean verified(){
 		return this.verified;
+	}
+	public void scheduleReverifyPiece(){
+		this.verified=false;
+		WorkerQueues.addJobToQueue("quick", new VerifyPiece(this));
 	}
 	public boolean invalid(){
 		return this.invalid;

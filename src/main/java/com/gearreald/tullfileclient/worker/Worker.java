@@ -26,8 +26,6 @@ public class Worker extends Thread {
 			//The worker will attempt the job from it's queue.
 			try{
 				if(job==null || job.attempted()) {
-					if(job!=null){
-					}
 					Thread.sleep(1000);
 				}
 				if(job!=null){

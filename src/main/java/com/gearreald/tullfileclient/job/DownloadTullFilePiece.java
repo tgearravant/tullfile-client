@@ -1,9 +1,6 @@
 package com.gearreald.tullfileclient.job;
 
-import java.io.File;
 import java.io.IOException;
-
-import org.apache.commons.lang3.StringUtils;
 
 import com.gearreald.tullfileclient.models.TullFile;
 import com.gearreald.tullfileclient.worker.HardStopException;
@@ -24,8 +21,7 @@ public class DownloadTullFilePiece extends Job {
 	public void work() throws WorkerException, HardStopException{
 		this.failPermanently();
 		try{
-			File f = File.createTempFile("TullFile"+StringUtils.leftPad(Integer.toString(this.pieceNumber), 8), ".part");
-			this.file.downloadPiece(f, this.pieceNumber);
+			this.file.downloadPiece(this.pieceNumber);
 			this.done=true;
 		}catch(IOException e){
 			throw new WorkerException("Download Failed",e);
