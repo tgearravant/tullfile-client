@@ -10,6 +10,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.control.ProgressBar?>
 
 <BorderPane fx:controller="com.gearreald.tullfileclient.controllers.FileViewController"
 	xmlns:fx="http://javafx.com/fxml">
@@ -20,11 +21,21 @@
 		</HBox>
 	</top>
 	<center>
-		<HBox spacing="5" alignment="CENTER">
-			<Label fx:id="pieceLabel"
-				text="Pieces:"/>
-			<Text fx:id="pieceText"
-				text=""/>
+		<HBox alignment="TOP_CENTER">
+			<VBox>
+				<HBox spacing="5">
+					<Label fx:id="sizeLabel"
+						text="File Size:"/>
+					<Text fx:id="sizeText"
+						text=""/>
+				</HBox>
+				<HBox spacing="5">
+					<Label fx:id="pieceLabel"
+						text="Pieces:"/>
+					<Text fx:id="pieceText"
+						text=""/>
+				</HBox>
+			</VBox>
 		</HBox>
 	</center>
 	<left>
@@ -39,4 +50,7 @@
 		    	text="Delete"/>
 		</VBox>
 	</right>
+	<bottom>
+		<ProgressBar fx:id="downloadProgressBar"/>
+	</bottom>
 </BorderPane>

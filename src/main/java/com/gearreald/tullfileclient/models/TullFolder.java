@@ -10,7 +10,7 @@ import org.json.JSONObject;
 import com.gearreald.tullfileclient.job.LoadTullFolderData;
 import com.gearreald.tullfileclient.worker.WorkerQueues;
 
-public class TullFolder {
+public class TullFolder implements TullObject {
 	
 	public List<TullFolder> subfolders;
 	public List<TullFile> files;

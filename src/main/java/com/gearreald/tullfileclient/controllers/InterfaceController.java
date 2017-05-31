@@ -40,11 +40,12 @@ public class InterfaceController {
 	@FXML public Button exitButton;
 	@FXML public Button uploadButton;
 	
-	public ObservableList<BorderPane> boxList = FXCollections.<BorderPane>observableArrayList();
+	public ObservableList<BorderPane> boxList;
 	
 	public TullFolder current;
 	
 	@FXML private void initialize(){
+		boxList= FXCollections.<BorderPane>observableArrayList();
 		this.header.setText("TullFile Server V0.1");
 		this.fileList.setItems(boxList);
 		setDisplayFolder(new TullFolder("/"),false);

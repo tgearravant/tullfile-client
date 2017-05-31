@@ -18,12 +18,13 @@ import com.gearreald.tullfileclient.worker.WorkerQueues;
 import net.tullco.tullutils.FileUtils;
 import net.tullco.tullutils.StringUtils;
 
-public class TullFile {
+public class TullFile implements TullObject {
 	
 	private String name;
 	private TullFolder parent;
 	private int pieceCount;
 	private List<Piece> pieceList;
+	private long fileSize;
 	
 	public TullFile(JSONObject json,TullFolder parent){
 		pieceList = new CopyOnWriteArrayList<Piece>();
@@ -32,10 +33,35 @@ public class TullFile {
 		}
 		this.name=json.getString("name");
 		this.pieceCount = json.getInt("pieces");
+		this.fileSize = json.getLong("size");
 		this.parent=parent;
 	}
 	public String getName(){
 		return this.name;
+	}
+	public long getFileSize(){
+		return this.fileSize;
+	}
+	public String getFileSizeAsString(){
+		int orderOfMagnitude = (int) (Math.log(fileSize)/Math.log(1024));
+		double displayNumber=this.getFileSize()/Math.pow(1024d, orderOfMagnitude);
+		String baseString = "%.2f%s";
+		switch (orderOfMagnitude){
+			case 0:
+				return String.format(baseString, displayNumber, "B");
+			case 1:
+				return String.format(baseString, displayNumber, "KB");
+			case 2:
+				return String.format(baseString, displayNumber, "MB");
+			case 3:
+				return String.format(baseString, displayNumber, "GB");
+			case 4:
+				return String.format(baseString, displayNumber, "TB");
+			case 5:
+				return String.format(baseString, displayNumber, "PB");
+			default:
+				return "0B";
+		}
 	}
 	public String getSuffix(){
 		String fileName = this.getName();
