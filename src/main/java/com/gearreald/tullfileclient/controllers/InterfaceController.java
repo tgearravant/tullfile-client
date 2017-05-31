@@ -100,7 +100,7 @@ public class InterfaceController {
 			ErrorDialogBox.dialogFor(e);
 		}
 		FileViewController controller = loader.<FileViewController>getController();
-		controller.setTullFile(f);
+		controller.setTullObject(f);
 	}
 	private void addTullFolder(TullFolder f){
 		FXMLLoader loader = new FXMLLoader(ResourceLoader.getResourceURL("fxml/folderListItem.fxml"));

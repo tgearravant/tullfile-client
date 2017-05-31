@@ -89,6 +89,12 @@ public class TullFolder implements TullObject {
 			folder=folder.getParentFolder();
 		return folder;
 	}
+	public boolean isTullFolder(){
+		return true;
+	}
+	public boolean isTullFile(){
+		return false;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.gearreald.tullfileclient.Environment;
 import com.gearreald.tullfileclient.models.TullFile;
+import com.gearreald.tullfileclient.models.TullObject;
 import com.gearreald.tullfileclient.utils.ImageUtils;
 
 import javafx.event.ActionEvent;
@@ -17,7 +18,7 @@ import javafx.scene.control.ProgressBar;
 
 public class FileViewController {
 	
-	private TullFile f;
+	private TullObject f;
 	@FXML private Label titleLabel;
 	@FXML private ImageView iconImage;
 	@FXML private Label pieceLabel;
@@ -28,32 +29,36 @@ public class FileViewController {
 	@FXML private Text sizeText;
 	@FXML private ProgressBar downloadProgressBar;
 	
-	public void setTullFile(TullFile f){
+	public void setTullObject(TullObject f){
 		this.f=f;
 		this.titleLabel.setText(this.f.getName());
 		this.iconImage.setImage(ImageUtils.getImage("file-icon.png"));
-		this.pieceText.setText(Integer.toString(this.f.getPieceCount()));
-		this.sizeText.setText(this.f.getFileSizeAsString());
-		this.downloadProgressBar.setProgress(0.5);
-		this.downloadProgressBar.setVisible(false);
+		if(this.f.isTullFile()){
+			TullFile tullFile = (TullFile) this.f;
+			this.pieceText.setText(Integer.toString(tullFile.getPieceCount()));
+			this.sizeText.setText(tullFile.getFileSizeAsString());
+			this.downloadProgressBar.setProgress(0.5);
+			this.downloadProgressBar.setVisible(false);
+		}
 	}
 	public void initialize(){
 	}
 	@FXML
 	public void downloadFile(ActionEvent e){
+		TullFile tullFile = (TullFile) this.f;
 		FileChooser chooser = new FileChooser();
-		String suffix = this.f.getSuffix();
+		String suffix = tullFile.getSuffix();
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(suffix.toUpperCase()+" files (*."+suffix+")", "*."+suffix+"");
         chooser.getExtensionFilters().add(extFilter);
 		File file = chooser.showSaveDialog(Environment.getPrimaryStage());
 		this.downloadProgressBar.setProgress(0);
 		this.downloadProgressBar.setVisible(true);
 		if(file!=null)
-			this.f.queueAllPiecesForDownload(file);
+			tullFile.queueAllPiecesForDownload(file);
 	}
 	@FXML
-	public void deleteFile(ActionEvent e){
-		if(this.f.deleteFile())
+	public void delete(ActionEvent e){
+		if(this.f.delete())
 			Environment.getInterfaceController().refreshCurrentFolder();
 	}
 	public void setProgress(double d) {

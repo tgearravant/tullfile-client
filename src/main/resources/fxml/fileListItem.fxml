@@ -46,7 +46,7 @@
 		<VBox spacing="10">
 		    <Button fx:id="downloadButton" onAction="#downloadFile"
 		    	text="Download"/>
-		    <Button fx:id="deleteButton" onAction="#deleteFile"
+		    <Button fx:id="deleteButton" onAction="#delete"
 		    	text="Delete"/>
 		</VBox>
 	</right>

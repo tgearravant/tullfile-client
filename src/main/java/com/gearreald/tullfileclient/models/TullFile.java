@@ -79,7 +79,7 @@ public class TullFile implements TullObject {
 	public int getPieceCount(){
 		return this.pieceCount;
 	}
-	public boolean deleteFile(){
+	public boolean delete(){
 		try {
 			ServerConnection.deleteFile(this.getLocalPath(), this.getName());
 			return true;
@@ -175,6 +175,12 @@ public class TullFile implements TullObject {
 			p.deletePiece();
 		}
 		this.pieceList.clear();
+	}
+	public boolean isTullFolder(){
+		return false;
+	}
+	public boolean isTullFile(){
+		return true;
 	}
 	@Override
 	public int hashCode() {
