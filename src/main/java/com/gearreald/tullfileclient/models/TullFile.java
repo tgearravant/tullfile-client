@@ -11,6 +11,8 @@ import org.json.JSONObject;
 
 import com.gearreald.tullfileclient.job.DownloadTullFilePiece;
 import com.gearreald.tullfileclient.job.Job;
+import com.gearreald.tullfileclient.job.MonitorUpload;
+import com.gearreald.tullfileclient.job.UploadFilePiece;
 import com.gearreald.tullfileclient.job.VerifyAndMergeFile;
 import com.gearreald.tullfileclient.job.VerifyPiece;
 import com.gearreald.tullfileclient.worker.WorkerQueues;
@@ -218,5 +220,12 @@ public class TullFile implements TullObject {
 		} else if (!parent.equals(other.parent))
 			return false;
 		return true;
+	}
+	public static void queueAllPiecesForUpload(File f, String localPath, String name){
+		int piecesInFile = ServerConnection.piecesInFile(f);
+		for(int i = 1; i<=piecesInFile; i++){
+			WorkerQueues.addJobToQueue("upload",new UploadFilePiece(f,localPath,name,i));
+		}
+		WorkerQueues.addJobToQueue("quick", new MonitorUpload(f,localPath,name));
 	}
 }

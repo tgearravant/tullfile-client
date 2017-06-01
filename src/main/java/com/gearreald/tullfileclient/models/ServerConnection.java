@@ -9,6 +9,8 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.xml.bind.DatatypeConverter;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,6 +30,7 @@ public class ServerConnection {
 	private static final String AUTH_URL = "";
 	private static final String VERIFY_PIECE_URL = "verify/";
 	private static final String VERIFY_FILE_URL = "verify_file/";
+	private static final String PIECE_COUNT_URL = "status/pieces/";
 	
 	private static final int CHUNK_SIZE = 2097152;
 	private static final int DOWNLOAD_RETRIES = 3;
@@ -71,6 +74,21 @@ public class ServerConnection {
 			return true;
 		}else{
 			return false;
+		}
+	}
+	public static int uploadedPieces(String localPath, String name) throws IOException{
+		String response = NetworkUtils.getDataFromURL(
+				getURLFor("PIECE_COUNT")
+				,false
+				,NetworkUtils.GET
+				,Pair.<String,String>of("localPath",localPath)
+				,Pair.<String,String>of("fileName",name)
+				,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
+		JSONObject responseJson = new JSONObject(response);
+		if((responseJson.get("message")).equals("success")){
+			return responseJson.getInt("piece_count");
+		}else{
+			return 0;
 		}
 	}
 	public static boolean deleteFolder(String localPath) throws IOException{
@@ -171,6 +189,50 @@ public class ServerConnection {
 			throw new IOException("The File Hash was not set.");
 	}
 	
+	public static void uploadFilePiece(File file, String filePath, String fileName, int pieceNumber) throws IOException{
+		FileInputStream f=null;
+		try{
+			//Determine how many pieces we've got in the file and complain vigorously if we've asked for too many pieces.
+			int pieceCount = piecesInFile(file);
+			if(pieceNumber > pieceCount){
+				throw new IOException("The file doesn't have that many pieces...");
+			}
+			//Now, let's skip all the things we don't care to read...
+			f = new FileInputStream(file);
+			int skipped=0;
+			int toSkip = (pieceNumber-1)*CHUNK_SIZE;
+			while(skipped < toSkip){
+				skipped+=f.skip(toSkip-skipped);
+			}
+			//Now, let's actually read the piece...
+			MessageDigest md = MessageDigest.getInstance("SHA-1");
+			byte[] byteBuffer = new byte[CHUNK_SIZE];
+			int bytesInBuffer=f.read(byteBuffer);
+			//Let's see if the server has a hash for it...
+			boolean shouldUpload=true;
+			try{
+				String serverHash = ServerConnection.getFilePieceHash(filePath, fileName, pieceNumber);
+				String localHash = DatatypeConverter.printHexBinary(md.digest(byteBuffer));
+				if(serverHash.equals(localHash)){
+					shouldUpload=false;
+				}
+			}catch(IOException e){}
+			
+			//If we should still upload it, let's go for it!
+			if(shouldUpload){
+				JSONObject json = sendByteStream(byteBuffer, bytesInBuffer, pieceNumber, filePath, fileName);
+				if(json.getString("status").equals("failure")){
+					throw new IOException("Upload failed.");
+				}
+			}
+		}catch(NoSuchAlgorithmException e){
+			ErrorDialogBox.dialogFor(e);
+		}finally{
+			if(f!=null)
+				f.close();
+		}
+	}
+		
 	public static void uploadFile(File file, String filePath, String fileName) throws IOException{
 		DigestInputStream dis=null;
 		try{
@@ -235,8 +297,13 @@ public class ServerConnection {
 				return baseURL + VERIFY_PIECE_URL;
 			case "VERIFY_FILE":
 				return baseURL + VERIFY_FILE_URL;
+			case "PIECE_COUNT":
+				return baseURL + PIECE_COUNT_URL;
 			default:
 				throw new RuntimeException("That URL doesn't exist...");
 		}
+	}
+	public static int piecesInFile(File f){
+		return (int)(f.length()/CHUNK_SIZE)+(f.length() % CHUNK_SIZE > 0 ? 1 : 0);
 	}
 }

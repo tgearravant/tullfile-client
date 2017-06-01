@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.gearreald.tullfileclient.Environment;
-import com.gearreald.tullfileclient.job.UploadFile;
 import com.gearreald.tullfileclient.models.ErrorDialogBox;
 import com.gearreald.tullfileclient.models.ServerConnection;
 import com.gearreald.tullfileclient.models.TullFile;
@@ -15,7 +14,6 @@ import com.gearreald.tullfileclient.models.TullFolder;
 import com.gearreald.tullfileclient.models.TullObject;
 import com.gearreald.tullfileclient.utils.ResourceLoader;
 import com.gearreald.tullfileclient.utils.SystemUtils;
-import com.gearreald.tullfileclient.worker.WorkerQueues;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -71,7 +69,8 @@ public class InterfaceController {
 				if(file.isDirectory()){
 					ErrorDialogBox.dialogFor(new Exception("Cannot currently upload directories."));
 				}else{
-					WorkerQueues.addJobToQueue("upload", new UploadFile(file,current.getLocalPath(),file.getName()));
+					//WorkerQueues.addJobToQueue("upload", new UploadFile(file,current.getLocalPath(),file.getName()));
+					TullFile.queueAllPiecesForUpload(file, this.current.getLocalPath(), file.getName());
 				}
 			}
 		}
@@ -81,8 +80,9 @@ public class InterfaceController {
 	}
 	public void updateProgressOfTullFile(TullFile file){
 		for(ItemListController controller:this.itemControllers){
-			if(file.equals(controller.getTullObject()))
+			if(file.equals(controller.getTullObject())){
 				controller.setProgress(file.getDownloadProgress());
+			}
 		}
 	}
 	public void setDisplayFolder(TullFolder f){
@@ -99,8 +99,9 @@ public class InterfaceController {
 		for(TullFolder subfolder : this.current.getSubfolders()){
 			this.addTullObject(subfolder);
 		}
-		for(TullFile file : this.current.getFiles())
+		for(TullFile file : this.current.getFiles()){
 			this.addTullObject(file);
+		}
 	}
 	private void addTullObject(TullObject object){
 		FXMLLoader loader = new FXMLLoader(ResourceLoader.getResourceURL("fxml/listItem.fxml"));
