@@ -12,7 +12,6 @@ public class UploadFilePiece extends Job {
 	private File file;
 	private String remotePath;
 	private String fileName;
-	private boolean done;
 	private int pieceNumber;
 	
 	public UploadFilePiece(File f, String remotePath, String fileName, int pieceNumber){
@@ -21,24 +20,19 @@ public class UploadFilePiece extends Job {
 		this.remotePath=remotePath;
 		this.fileName=fileName;
 		this.pieceNumber=pieceNumber;
-		this.done=false;
 	}
 	public void work() throws WorkerException, HardStopException{
 		this.failPermanently();
 		try {
 			ServerConnection.uploadFilePiece(file, remotePath, fileName, pieceNumber);
+			this.completeJob();
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new WorkerException(e);
 		}
-		this.done=true;
 	}
 	@Override
 	public String getJobName() {
 		return String.format(JOB_NAME, this.fileName, this.pieceNumber);
-	}
-	@Override
-	public boolean completed() {
-		return this.done;
 	}
 }

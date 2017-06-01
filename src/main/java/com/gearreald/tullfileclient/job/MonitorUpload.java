@@ -17,12 +17,9 @@ public class MonitorUpload extends Job {
 	private final String localPath;
 	private final String name;
 	
-	private boolean done;
-	
 	public MonitorUpload(File f, String localPath, String name){
 		super();
 		this.file=f;
-		this.done=false;
 		this.localPath=localPath;
 		this.name=name;
 	}
@@ -33,7 +30,7 @@ public class MonitorUpload extends Job {
 		try {
 			int uploadedPieces = ServerConnection.uploadedPieces(localPath, name);
 			if(uploadedPieces >= ServerConnection.piecesInFile(this.file))
-				this.done=true;
+				this.completeJob();
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new WorkerException(e);
@@ -46,10 +43,5 @@ public class MonitorUpload extends Job {
 	@Override
 	public String getJobName() {
 		return String.format(JOB_NAME,this.file.getName());
-	}
-
-	@Override
-	public boolean completed() {
-		return this.done;
 	}
 }

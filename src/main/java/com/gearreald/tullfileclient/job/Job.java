@@ -15,10 +15,18 @@ public abstract class Job {
 	
 	private static final int DEFAULT_RETRIES=5;
 	private boolean attempted;
+	private boolean done;
 	
 	public Job(){
 		this.uuid=UUID.randomUUID();
 		this.attempted=false;
+		this.done=false;
+	}
+	protected void completeJob(){
+		this.done=true;
+	}
+	public boolean completed(){
+		return this.done;
 	}
 	/**
 	 * Gets the UUID associated with this job.
@@ -28,6 +36,7 @@ public abstract class Job {
 		return this.uuid;
 	}
 	public abstract void work() throws WorkerException, HardStopException;
+	public abstract void theJob() throws WorkerException;
 	public abstract String getJobName();
 	public int getRetries(){
 		return Job.DEFAULT_RETRIES;
@@ -58,5 +67,4 @@ public abstract class Job {
 		Job j = (Job) o;
 		return j.getUUID().equals(this.getUUID());
 	}
-	public abstract boolean completed();
 }

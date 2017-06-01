@@ -11,18 +11,17 @@ import com.gearreald.tullfileclient.worker.WorkerException;
 public class LoadTullFolderData extends Job {
 
 	public TullFolder folder;
-	public boolean done;
 	public final static String JOB_NAME = "LoadData";
 	
 	public LoadTullFolderData(TullFolder f){
+		super();
 		this.folder=f;
-		this.done=false;
 	}
 	public void work() throws WorkerException, HardStopException{
 		this.failPermanently();
 		try {
 			this.folder.fetchFolderData(false);
-			this.done=true;
+			this.completeJob();
 		} catch (IOException e) {
 			throw new WorkerException("There was an error fetching the folder data.",e);
 		} catch (JSONException e) {
@@ -32,9 +31,5 @@ public class LoadTullFolderData extends Job {
 	@Override
 	public String getJobName() {
 		return JOB_NAME;
-	}
-	@Override
-	public boolean completed() {
-		return this.done;
 	}
 }
