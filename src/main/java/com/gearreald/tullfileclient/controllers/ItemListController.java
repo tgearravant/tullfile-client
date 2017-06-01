@@ -58,6 +58,7 @@ public class ItemListController {
 	public void downloadFile(ActionEvent e){
 		TullFile tullFile = (TullFile) this.f;
 		FileChooser chooser = new FileChooser();
+		chooser.setInitialFileName(this.getTullObject().getName());
 		String suffix = tullFile.getSuffix();
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(suffix.toUpperCase()+" files (*."+suffix+")", "*."+suffix+"");
         chooser.getExtensionFilters().add(extFilter);
