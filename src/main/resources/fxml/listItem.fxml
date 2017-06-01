@@ -12,7 +12,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.control.ProgressBar?>
 
-<BorderPane fx:controller="com.gearreald.tullfileclient.controllers.FileViewController"
+<BorderPane fx:controller="com.gearreald.tullfileclient.controllers.ItemListController"
 	xmlns:fx="http://javafx.com/fxml">
 	<top>
 		<HBox alignment="CENTER">
@@ -43,14 +43,17 @@
 	    	fitHeight="25.0" fitWidth="25.0"/>
 	</left>
 	<right>
-		<VBox spacing="10">
+		<VBox spacing="5">
+		    <Button fx:id="openButton" onAction="#changeInterfaceTullFolder"
+		    	text="Open" visible ="false" managed="false"/>
 		    <Button fx:id="downloadButton" onAction="#downloadFile"
-		    	text="Download"/>
+		    	text="Download" visible ="false" managed="false"/>
 		    <Button fx:id="deleteButton" onAction="#delete"
 		    	text="Delete"/>
 		</VBox>
 	</right>
 	<bottom>
-		<ProgressBar fx:id="downloadProgressBar"/>
+		<ProgressBar fx:id="downloadProgressBar"
+			visible="false" managed="false"/>
 	</bottom>
 </BorderPane>

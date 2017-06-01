@@ -79,6 +79,14 @@ public class TullFile implements TullObject {
 	public int getPieceCount(){
 		return this.pieceCount;
 	}
+	public double getDownloadProgress(){
+		int verified=0;
+		for(Piece p: this.pieceList){
+			if(p.verified())
+				verified++;
+		}
+		return (double)verified/this.pieceCount;
+	}
 	public boolean delete(){
 		try {
 			ServerConnection.deleteFile(this.getLocalPath(), this.getName());
