@@ -3,12 +3,9 @@ package com.gearreald.tullfileclient.job;
 import java.io.File;
 import java.io.IOException;
 
-import com.gearreald.tullfileclient.Environment;
 import com.gearreald.tullfileclient.models.ServerConnection;
 import com.gearreald.tullfileclient.worker.HardStopException;
 import com.gearreald.tullfileclient.worker.WorkerException;
-
-import javafx.application.Platform;
 
 public class UploadFilePiece extends Job {
 	private static final String JOB_NAME="Upload File %s: Piece # %d";
