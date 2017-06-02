@@ -24,14 +24,9 @@ public class LoginController {
     @FXML private TextField portField;
     @FXML private PasswordField keyField;
     @FXML private Text actionTarget;
-    
-    public final static String DEFAULT_PORT="12345";
-    
+        
     @FXML public void initialize(){
-    	this.portField.setText(DEFAULT_PORT);
-    	if(Environment.inDevelopment()){
-    		testingAutofill();
-    	}
+    	autofillDefaults();
     }
     
     @FXML public void keyListener(KeyEvent event) {
@@ -81,8 +76,9 @@ public class LoginController {
     	stage.setScene(scene);
     }
     
-    private void testingAutofill(){
-		this.serverAddressField.setText("127.0.0.1");
-		this.keyField.setText("lol");
+    private void autofillDefaults(){
+    	this.portField.setText(Environment.getConfiguration("default_port"));
+		this.serverAddressField.setText(Environment.getConfiguration("default_host"));
+		this.keyField.setText(Environment.getConfiguration("default_key"));
     }
 }

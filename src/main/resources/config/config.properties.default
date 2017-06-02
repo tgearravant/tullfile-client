@@ -1,4 +1,10 @@
 home_directory_subfolder_name=TullFile
 tullfile_suffix=.tullfile
+
 environment=development
+
 use_ssl=true
+
+default_host=127.0.0.1
+default_port=12345
+default_key=lol
