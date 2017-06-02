@@ -22,6 +22,10 @@ public abstract class Job {
 		this.attempted=false;
 		this.done=false;
 	}
+	
+	public abstract void theJob() throws WorkerException;
+	public abstract String getJobName();
+	
 	protected void completeJob(){
 		this.done=true;
 	}
@@ -43,9 +47,6 @@ public abstract class Job {
 		}
 		theJob();
 	}
-	
-	public abstract void theJob() throws WorkerException;
-	public abstract String getJobName();
 	
 	public int getRetries(){
 		return Job.DEFAULT_RETRIES;
