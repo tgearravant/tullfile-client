@@ -18,6 +18,7 @@ import com.gearreald.tullfileclient.Environment;
 
 import net.tullco.tullutils.NetworkUtils;
 import net.tullco.tullutils.Pair;
+import net.tullco.tullutils.StringUtils;
 
 public class ServerConnection {
 	
@@ -36,9 +37,10 @@ public class ServerConnection {
 	private static final int DOWNLOAD_RETRIES = 3;
 	
 	public static boolean checkKey() throws MalformedURLException, IOException{
+		System.out.println(ServerConnection.useSSL());
 		NetworkUtils.getDataFromURL(
 				getURLFor("AUTH")
-				,false
+				,useSSL()
 				,NetworkUtils.HEAD
 				,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
 		return true;
@@ -50,7 +52,7 @@ public class ServerConnection {
 		request.put("name", name);
 		String response = NetworkUtils.sendDataToURL(
 				getURLFor("NEW_FOLDER")
-				,false
+				,useSSL()
 				,NetworkUtils.POST
 				,request.toString()
 				,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
@@ -66,7 +68,7 @@ public class ServerConnection {
 		request.put("name", name);
 		String response = NetworkUtils.sendDataToURL(
 				getURLFor("DELETE_FILE")
-				,false
+				,useSSL()
 				,NetworkUtils.DELETE
 				,request.toString()
 				,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
@@ -79,7 +81,7 @@ public class ServerConnection {
 	public static int uploadedPieces(String localPath, String name) throws IOException{
 		String response = NetworkUtils.getDataFromURL(
 				getURLFor("PIECE_COUNT")
-				,false
+				,useSSL()
 				,NetworkUtils.GET
 				,Pair.<String,String>of("localPath",localPath)
 				,Pair.<String,String>of("fileName",name)
@@ -96,7 +98,7 @@ public class ServerConnection {
 		request.put("directory", localPath);
 		String response = NetworkUtils.sendDataToURL(
 				getURLFor("DELETE_FOLDER")
-				,false
+				,useSSL()
 				,NetworkUtils.DELETE
 				,request.toString()
 				,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
@@ -113,7 +115,7 @@ public class ServerConnection {
 			try{
 				byte[] data = NetworkUtils.getBinaryDataFromURL(
 						getURLFor("DOWNLOAD")
-						,false
+						,useSSL()
 						,NetworkUtils.GET
 						,Pair.<String,String>of("localPath",localPath)
 						,Pair.<String,String>of("fileName",fileName)
@@ -133,7 +135,7 @@ public class ServerConnection {
 		request.put("directory", localPath);
 		String response = NetworkUtils.sendDataToURL(
 				getURLFor("LIST")
-				,false
+				,useSSL()
 				,NetworkUtils.POST
 				,request.toString()
 				,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
@@ -143,7 +145,7 @@ public class ServerConnection {
 	public static String getFilePieceHash(String localPath, String name, int piece) throws IOException {
 		String response = NetworkUtils.getDataFromURL(
 				getURLFor("VERIFY_PIECE")
-				,false
+				,useSSL()
 				,NetworkUtils.GET
 				,Pair.<String,String>of("localPath",localPath)
 				,Pair.<String,String>of("fileName",name)
@@ -160,7 +162,7 @@ public class ServerConnection {
 	public static String getFileHash(String localPath, String name) throws IOException {
 		String response = NetworkUtils.getDataFromURL(
 				getURLFor("VERIFY_FILE")
-				,false
+				,useSSL()
 				,NetworkUtils.GET
 				,Pair.<String,String>of("localPath",localPath)
 				,Pair.<String,String>of("fileName",name)
@@ -180,7 +182,7 @@ public class ServerConnection {
 		requestJson.put("fileName", name);
 		String response = NetworkUtils.sendDataToURL(
 				getURLFor("VERIFY_FILE")
-				,false
+				,useSSL()
 				,NetworkUtils.PUT
 				,requestJson.toString()
 				,Pair.<String,String>of("Authorization", Environment.getConfiguration("API_KEY")));
@@ -263,7 +265,7 @@ public class ServerConnection {
 			,String fileName) throws MalformedURLException, IOException {
 		String response = NetworkUtils.sendBinaryDataToURL(
 				getURLFor("UPLOAD")
-				,false
+				,useSSL()
 				,NetworkUtils.POST
 				,byteBuffer
 				,bytesInBuffer
@@ -275,9 +277,12 @@ public class ServerConnection {
 	}
 	
 	private static String getURLFor(String location){
-		String baseURL = Environment.getConfiguration(("HOSTNAME"));
-		if(!baseURL.endsWith("/"))
-			baseURL+="/";
+		String baseURL;
+		if(useSSL())
+			baseURL=StringUtils.assureStartsWith(Environment.getConfiguration(("HOSTNAME")),"https://");
+		else
+			baseURL=StringUtils.assureStartsWith(Environment.getConfiguration(("HOSTNAME")),"http://");
+		baseURL=StringUtils.assureEndsWith(baseURL, "/");
 		switch(location){
 			case "LIST":
 				return baseURL + LIST_URL;
@@ -305,5 +310,11 @@ public class ServerConnection {
 	}
 	public static int piecesInFile(File f){
 		return (int)(f.length()/CHUNK_SIZE)+(f.length() % CHUNK_SIZE > 0 ? 1 : 0);
+	}
+	private static boolean useSSL(){
+		if(Environment.getConfiguration("use_ssl").equals("true"))
+			return true;
+		else
+			return false;
 	}
 }

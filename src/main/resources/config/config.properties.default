@@ -1,2 +1,4 @@
 home_directory_subfolder_name=TullFile
 tullfile_suffix=.tullfile
+environment=development
+use_ssl=true

@@ -9,7 +9,7 @@ public class SystemUtils {
 	final private static Boolean IS_WINDOWS=(System.getProperty("os.name").contains("Windows"));
 	final private static String[] requiredProperties={"admin_username","admin_password","s3_access_key_id","s3_secret_key","backup_key"};
 	private static Properties properties=null;
-
+	
 	public static boolean inProduction(){
 		return !IS_WINDOWS;
 	}

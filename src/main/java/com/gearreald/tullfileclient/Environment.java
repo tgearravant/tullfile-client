@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.gearreald.tullfileclient.controllers.InterfaceController;
+import com.gearreald.tullfileclient.utils.SystemUtils;
 import com.gearreald.tullfileclient.worker.Worker;
 
 import javafx.stage.Stage;
@@ -28,7 +29,7 @@ public class Environment {
 	}
 	
 	public static String getConfiguration(String key){
-		return NullUtils.coalesce(configuration.get(key),"");
+		return NullUtils.coalesce(configuration.get(key),SystemUtils.getProperty(key),"");
 	}
 	public static void setTesting(boolean testing){
 		if(testing)
@@ -36,11 +37,12 @@ public class Environment {
 		else
 			setConfiguration("TESTING","f");
 	}
-	public static boolean inTesting(){
-		String testing = getConfiguration("TESTING");
-		if(testing==null || !testing.equals("t"))
+	public static boolean inDevelopment(){
+		String environment = getConfiguration("environment");
+		if(!environment.equals("production") && !environment.equals("testing"))
+			return true;
+		else
 			return false;
-		return true;
 	}
 	public static void initializeWorkers(){
 		for(int i=0;i<UPLOAD_WORKERS;i++){

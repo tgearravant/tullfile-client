@@ -29,7 +29,7 @@ public class LoginController {
     
     @FXML public void initialize(){
     	this.portField.setText(DEFAULT_PORT);
-    	if(Environment.inTesting()){
+    	if(Environment.inDevelopment()){
     		testingAutofill();
     	}
     }
@@ -46,7 +46,7 @@ public class LoginController {
     }
     
     private void changeToInterface(){
-    	String serverAddress = "http://"+this.serverAddressField.getText()+":"+this.portField.getText()+"/";
+    	String serverAddress = this.serverAddressField.getText()+":"+this.portField.getText()+"/";
     	String apiKey = this.keyField.getText();
     	Environment.setConfiguration("HOSTNAME", serverAddress);
     	Environment.setConfiguration("API_KEY", apiKey);
