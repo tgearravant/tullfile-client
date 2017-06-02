@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import com.gearreald.tullfileclient.Environment;
 import com.gearreald.tullfileclient.models.ServerConnection;
-import com.gearreald.tullfileclient.worker.HardStopException;
 import com.gearreald.tullfileclient.worker.WorkerException;
 
 import javafx.application.Platform;
@@ -25,8 +24,7 @@ public class MonitorUpload extends Job {
 	}
 	
 	@Override
-	public void work() throws WorkerException, HardStopException{
-		this.failPermanently();
+	public void theJob() throws WorkerException {
 		try {
 			int uploadedPieces = ServerConnection.uploadedPieces(localPath, name);
 			if(uploadedPieces >= ServerConnection.piecesInFile(this.file))

@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.json.JSONException;
 
 import com.gearreald.tullfileclient.models.TullFolder;
-import com.gearreald.tullfileclient.worker.HardStopException;
 import com.gearreald.tullfileclient.worker.WorkerException;
 
 public class LoadTullFolderData extends Job {
@@ -17,8 +16,7 @@ public class LoadTullFolderData extends Job {
 		super();
 		this.folder=f;
 	}
-	public void work() throws WorkerException, HardStopException{
-		this.failPermanently();
+	public void theJob() throws WorkerException {
 		try {
 			this.folder.fetchFolderData(false);
 			this.completeJob();

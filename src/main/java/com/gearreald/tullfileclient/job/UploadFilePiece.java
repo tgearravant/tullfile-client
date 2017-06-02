@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import com.gearreald.tullfileclient.models.ServerConnection;
-import com.gearreald.tullfileclient.worker.HardStopException;
 import com.gearreald.tullfileclient.worker.WorkerException;
 
 public class UploadFilePiece extends Job {
@@ -21,8 +20,7 @@ public class UploadFilePiece extends Job {
 		this.fileName=fileName;
 		this.pieceNumber=pieceNumber;
 	}
-	public void work() throws WorkerException, HardStopException{
-		this.failPermanently();
+	public void theJob() throws WorkerException {
 		try {
 			ServerConnection.uploadFilePiece(file, remotePath, fileName, pieceNumber);
 			this.completeJob();

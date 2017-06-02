@@ -3,7 +3,6 @@ package com.gearreald.tullfileclient.job;
 import java.io.IOException;
 
 import com.gearreald.tullfileclient.models.Piece;
-import com.gearreald.tullfileclient.worker.HardStopException;
 import com.gearreald.tullfileclient.worker.WorkerException;
 
 public class VerifyPiece extends Job {
@@ -17,8 +16,7 @@ public class VerifyPiece extends Job {
 		this.done=false;
 	}
 	@Override
-	public void work() throws WorkerException, HardStopException {
-		this.failPermanently();
+	public void theJob() throws WorkerException {
 		try {
 			this.piece.verifyPiece();
 			this.done = true;

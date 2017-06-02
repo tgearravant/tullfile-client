@@ -6,7 +6,6 @@ import java.security.NoSuchAlgorithmException;
 
 import com.gearreald.tullfileclient.Environment;
 import com.gearreald.tullfileclient.models.TullFile;
-import com.gearreald.tullfileclient.worker.HardStopException;
 import com.gearreald.tullfileclient.worker.WorkerException;
 
 import javafx.application.Platform;
@@ -26,8 +25,7 @@ public class VerifyAndMergeFile extends Job {
 	}
 	
 	@Override
-	public void work() throws WorkerException, HardStopException{
-		this.failPermanently();
+	public void theJob() throws WorkerException{
 		Platform.runLater( () -> { Environment.getInterfaceController().updateProgressOfTullFile(file);});
 		if(!this.file.allPiecesValid()) {
 			this.file.trashInvalidPieces();

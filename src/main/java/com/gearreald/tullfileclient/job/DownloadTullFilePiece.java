@@ -3,7 +3,6 @@ package com.gearreald.tullfileclient.job;
 import java.io.IOException;
 
 import com.gearreald.tullfileclient.models.TullFile;
-import com.gearreald.tullfileclient.worker.HardStopException;
 import com.gearreald.tullfileclient.worker.WorkerException;
 
 public class DownloadTullFilePiece extends Job {
@@ -17,8 +16,7 @@ public class DownloadTullFilePiece extends Job {
 		this.file=f;
 		this.pieceNumber=pieceNumber;
 	}
-	public void work() throws WorkerException, HardStopException{
-		this.failPermanently();
+	public void theJob() throws WorkerException {
 		try{
 			this.file.downloadPiece(this.pieceNumber);
 			this.completeJob();

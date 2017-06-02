@@ -35,18 +35,20 @@ public abstract class Job {
 	public UUID getUUID(){
 		return this.uuid;
 	}
-	public abstract void work() throws WorkerException, HardStopException;
-	public abstract void theJob() throws WorkerException;
-	public abstract String getJobName();
-	public int getRetries(){
-		return Job.DEFAULT_RETRIES;
-	}
-	public void failPermanently() throws HardStopException{
+	public void work() throws WorkerException, HardStopException {
 		this.attempted=true;
 		int failures = WorkerQueues.failCount(this);
 		if(failures>this.getRetries()){
 			throw new HardStopException(this.getFailureString());
 		}
+		theJob();
+	}
+	
+	public abstract void theJob() throws WorkerException;
+	public abstract String getJobName();
+	
+	public int getRetries(){
+		return Job.DEFAULT_RETRIES;
 	}
 	public String getFailureString(){
 		return "The job "+getJobName()+" has failed too many times and is being abandoned.";
