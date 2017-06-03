@@ -74,6 +74,32 @@ public class InterfaceController {
 			}
 		}
 	}
+	@FXML private void toHomeFolder(){
+		this.setDisplayFolder(this.current.getRootFolder());
+	}
+	@FXML private void toParentFolder(){
+		TullFolder parentFolder = this.current.getParentFolder();
+		if(parentFolder == null){
+			parentFolder = this.current;
+		}
+		this.setDisplayFolder(parentFolder);
+	}
+	@FXML private void createNewFolder(){
+		TextInputDialog dialog = new TextInputDialog("New Folder");
+		dialog.setTitle("Create a New Folder");
+		dialog.setContentText("Enter a name for the new folder:");
+		dialog.setHeaderText(null);
+		Optional<String> result = dialog.showAndWait();
+		if (result.isPresent()){
+			String newFolderName = result.get();
+			try {
+				ServerConnection.createNewFolder(current.getLocalPath(), newFolderName);
+			} catch (IOException e) {
+				ErrorDialogBox.dialogFor(e);
+			}
+			this.setDisplayFolder(current, true);
+		}
+	}
 	public void refreshCurrentFolder(){
 		this.setDisplayFolder(this.current, true);
 	}
@@ -112,31 +138,5 @@ public class InterfaceController {
 		ItemListController controller = loader.<ItemListController>getController();
 		this.itemControllers.add(controller);
 		controller.setTullObject(object);
-	}
-	@FXML private void toHomeFolder(){
-		this.setDisplayFolder(this.current.getRootFolder());
-	}
-	@FXML private void toParentFolder(){
-		TullFolder parentFolder = this.current.getParentFolder();
-		if(parentFolder == null){
-			parentFolder = this.current;
-		}
-		this.setDisplayFolder(parentFolder);
-	}
-	@FXML private void createNewFolder(){
-		TextInputDialog dialog = new TextInputDialog("New Folder");
-		dialog.setTitle("Create a New Folder");
-		dialog.setContentText("Enter a name for the new folder:");
-		dialog.setHeaderText(null);
-		Optional<String> result = dialog.showAndWait();
-		if (result.isPresent()){
-			String newFolderName = result.get();
-			try {
-				ServerConnection.createNewFolder(current.getLocalPath(), newFolderName);
-			} catch (IOException e) {
-				ErrorDialogBox.dialogFor(e);
-			}
-			this.setDisplayFolder(current, true);
-		}
 	}
 }
