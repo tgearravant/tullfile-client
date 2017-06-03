@@ -46,7 +46,7 @@ public class TullFolder implements TullObject, Comparable<TullFolder> {
 		return this.files;
 	}
 	public synchronized void fetchFolderData(boolean force) throws IOException{
-		if(this.fetched&&!force)
+		if(!(force || !this.fetched))
 			return;
 		if(this.fetched){
 			this.subfolders.clear();
