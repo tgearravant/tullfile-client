@@ -10,7 +10,7 @@ import org.json.JSONObject;
 import com.gearreald.tullfileclient.job.LoadTullFolderData;
 import com.gearreald.tullfileclient.worker.WorkerQueues;
 
-public class TullFolder implements TullObject {
+public class TullFolder implements TullObject, Comparable<TullFolder> {
 	
 	public List<TullFolder> subfolders;
 	public List<TullFile> files;
@@ -57,6 +57,8 @@ public class TullFolder implements TullObject {
 		for(TullFolder folder: this.subfolders){
 			WorkerQueues.addJobToQueue("quick", new LoadTullFolderData(folder));
 		}
+		this.subfolders.sort(null);
+		this.files.sort(null);
 		this.fetched=true;
 	}
 	private void fromJSON(JSONObject json){
@@ -123,5 +125,11 @@ public class TullFolder implements TullObject {
 		} else if (!parent.equals(other.parent))
 			return false;
 		return true;
+	}
+	@Override
+	public int compareTo(TullFolder o) {
+		if(this.equals(o))
+			return 0;
+		return this.name.compareTo(o.name);
 	}
 }

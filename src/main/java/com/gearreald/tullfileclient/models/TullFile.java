@@ -20,7 +20,7 @@ import com.gearreald.tullfileclient.worker.WorkerQueues;
 import net.tullco.tullutils.FileUtils;
 import net.tullco.tullutils.StringUtils;
 
-public class TullFile implements TullObject {
+public class TullFile implements TullObject, Comparable<TullFile> {
 	
 	private String name;
 	private TullFolder parent;
@@ -227,5 +227,11 @@ public class TullFile implements TullObject {
 			WorkerQueues.addJobToQueue("upload",new UploadFilePiece(f,localPath,name,i));
 		}
 		WorkerQueues.addJobToQueue("quick", new MonitorUpload(f,localPath,name));
+	}
+	@Override
+	public int compareTo(TullFile o) {
+		if(this.equals(o))
+			return 0;
+		return this.name.compareTo(o.name);
 	}
 }

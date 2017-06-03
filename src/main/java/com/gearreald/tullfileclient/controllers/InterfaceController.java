@@ -69,7 +69,6 @@ public class InterfaceController {
 				if(file.isDirectory()){
 					ErrorDialogBox.dialogFor(new Exception("Cannot currently upload directories."));
 				}else{
-					//WorkerQueues.addJobToQueue("upload", new UploadFile(file,current.getLocalPath(),file.getName()));
 					TullFile.queueAllPiecesForUpload(file, this.current.getLocalPath(), file.getName());
 				}
 			}
