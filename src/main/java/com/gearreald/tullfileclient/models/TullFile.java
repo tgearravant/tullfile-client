@@ -232,6 +232,6 @@ public class TullFile implements TullObject, Comparable<TullFile> {
 	public int compareTo(TullFile o) {
 		if(this.equals(o))
 			return 0;
-		return this.name.compareTo(o.name);
+		return this.name.toLowerCase().compareTo(o.name.toLowerCase());
 	}
 }

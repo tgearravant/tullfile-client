@@ -130,6 +130,6 @@ public class TullFolder implements TullObject, Comparable<TullFolder> {
 	public int compareTo(TullFolder o) {
 		if(this.equals(o))
 			return 0;
-		return this.name.compareTo(o.name);
+		return this.name.toLowerCase().compareTo(o.name.toLowerCase());
 	}
 }
