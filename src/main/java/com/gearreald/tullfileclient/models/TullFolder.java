@@ -31,14 +31,20 @@ public class TullFolder implements TullObject, Comparable<TullFolder> {
 		this.subfolders = new CopyOnWriteArrayList<TullFolder>();
 		this.files = new CopyOnWriteArrayList<TullFile>();
 	}
+	@Override
 	public String getName(){
 		return this.name;
 	}
+	@Override
 	public String getLocalPath(){
 		if(this.parent==null){
 			return "/";
 		}
 		return this.parent.getLocalPath()+this.getName()+"/";
+	}
+	@Override
+	public TullFolder getParent() {
+		return this.parent;
 	}
 	public List<TullFolder> getSubfolders() {
 		return this.subfolders;
@@ -82,12 +88,8 @@ public class TullFolder implements TullObject, Comparable<TullFolder> {
 		Iterator<TullFile> fileIterator = this.getFiles().iterator();
 		while(fileIterator.hasNext()){
 			TullFile oldFile = fileIterator.next();
-			if(!newFolder.getSubfolders().contains(oldFile)){
-				this.getSubfolders().remove(oldFile);
-
-				System.out.println("Removed " + oldFile.getName());
-				for(TullFolder f: this.getSubfolders())
-					System.out.println(f.getName());
+			if(!newFolder.getFiles().contains(oldFile)){
+				this.getFiles().remove(oldFile);
 			}
 		}
 		//now update existing files
@@ -120,6 +122,7 @@ public class TullFolder implements TullObject, Comparable<TullFolder> {
 	public void removeFile(TullFile file){
 		this.files.remove(file);
 	}
+	@Override
 	public boolean delete(){
 		try {
 			ServerConnection.deleteFolder(this.getLocalPath());
@@ -149,7 +152,7 @@ public class TullFolder implements TullObject, Comparable<TullFolder> {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((parent == null) ? 0 : parent.hashCode());
+		result = prime * result + ((this.getLocalPath() == null) ? 0 : this.getLocalPath().hashCode());
 		return result;
 	}
 	@Override
@@ -166,10 +169,10 @@ public class TullFolder implements TullObject, Comparable<TullFolder> {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
-		if (parent == null) {
-			if (other.parent != null)
+		if (this.getLocalPath() == null) {
+			if (other.getLocalPath() != null)
 				return false;
-		} else if (!parent.equals(other.parent))
+		} else if (!this.getLocalPath().equals(other.getLocalPath()))
 			return false;
 		return true;
 	}
