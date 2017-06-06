@@ -8,25 +8,22 @@ import com.gearreald.tullfileclient.Environment;
 import com.gearreald.tullfileclient.models.TullFile;
 import com.gearreald.tullfileclient.worker.WorkerException;
 
-import javafx.application.Platform;
 import net.tullco.tullutils.FileUtils;
 
 public class VerifyAndMergeFile extends Job {
 
-	private static final String JOB_NAME="Verify and Merge ";
+	private static final String JOB_NAME="Verify and Merge %s";
 	private TullFile file;
 	private File destination;
-	private boolean done;
 	
 	public VerifyAndMergeFile(TullFile f, File destination){
 		this.file=f;
-		this.done=false;
 		this.destination=destination;
 	}
 	
 	@Override
 	public void theJob() throws WorkerException{
-		Platform.runLater( () -> { Environment.getInterfaceController().updateProgressOfTullFile(file);});
+		Environment.getInterfaceController().updateProgressOfTullFile(file);
 		if(!this.file.allPiecesValid()) {
 			this.file.trashInvalidPieces();
 		}else if(!this.file.allPiecesDownloaded()){
@@ -38,7 +35,7 @@ public class VerifyAndMergeFile extends Job {
 				String localHash = FileUtils.sha1Hash(this.destination);
 				if(serverHash==null || serverHash.equals(localHash)){
 					this.file.cleanUpAllPieces();
-					this.done=true;
+					this.completeJob();
 				}else{
 					this.file.reverifyPieces();
 				}
@@ -51,11 +48,6 @@ public class VerifyAndMergeFile extends Job {
 
 	@Override
 	public String getJobName() {
-		return JOB_NAME+this.file.getName();
-	}
-
-	@Override
-	public boolean completed() {
-		return this.done;
+		return String.format(JOB_NAME,this.file.getName());
 	}
 }

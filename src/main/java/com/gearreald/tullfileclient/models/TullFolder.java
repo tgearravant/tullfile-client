@@ -1,8 +1,9 @@
 package com.gearreald.tullfileclient.models;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,10 +13,10 @@ import com.gearreald.tullfileclient.worker.WorkerQueues;
 
 public class TullFolder implements TullObject, Comparable<TullFolder> {
 	
-	public List<TullFolder> subfolders;
-	public List<TullFile> files;
+	private List<TullFolder> subfolders;
+	private List<TullFile> files;
 	
-	public boolean fetched = false;
+	private boolean fetched = false;
 	
 	private String name;
 	
@@ -27,8 +28,8 @@ public class TullFolder implements TullObject, Comparable<TullFolder> {
 	public TullFolder(String name, TullFolder parent){
 		this.name=name;
 		this.parent=parent;
-		this.subfolders = new ArrayList<TullFolder>();
-		this.files = new ArrayList<TullFile>();
+		this.subfolders = new CopyOnWriteArrayList<TullFolder>();
+		this.files = new CopyOnWriteArrayList<TullFile>();
 	}
 	public String getName(){
 		return this.name;
@@ -46,32 +47,78 @@ public class TullFolder implements TullObject, Comparable<TullFolder> {
 		return this.files;
 	}
 	public synchronized void fetchFolderData(boolean force) throws IOException{
-		if(!(force || !this.fetched))
+		if(force==true)
+			this.fetched=false;
+		if(this.fetched)
 			return;
-		if(this.fetched){
-			this.subfolders.clear();
-			this.files.clear();
-		}
+		System.out.println("Fetching... "+this.toString());
 		JSONObject folderJSON = ServerConnection.getFileListing(this.getLocalPath());
-		fromJSON(folderJSON.getJSONObject("response"));
-		for(TullFolder folder: this.subfolders){
-			WorkerQueues.addJobToQueue("quick", new LoadTullFolderData(folder));
-		}
+		TullFolder fetchedFolder = TullFolder.fromJSON(this.getParentFolder(), this.getName(), folderJSON.getJSONObject("response"));
+		this.update(fetchedFolder);
 		this.subfolders.sort(null);
 		this.files.sort(null);
 		this.fetched=true;
 	}
-	private void fromJSON(JSONObject json){
+	private void update(TullFolder newFolder){
+		//first add new folders
+		for(TullFolder newSubFolder: newFolder.getSubfolders()){
+			if(!this.subfolders.contains(newSubFolder))
+				this.subfolders.add(newSubFolder);
+		}
+		//then add new files
+		for(TullFile newFile: newFolder.getFiles()){
+			if(!this.getFiles().contains(newFile))
+				this.getFiles().add(newFile);
+		}
+		//now delete old folders
+		Iterator<TullFolder> folderIterator = this.getSubfolders().iterator();
+		while(folderIterator.hasNext()){
+			TullFolder currentSubFolder = folderIterator.next();
+			if(!newFolder.getSubfolders().contains(currentSubFolder)){
+				this.getSubfolders().remove(currentSubFolder);
+			}
+		}
+		//now delete old files
+		Iterator<TullFile> fileIterator = this.getFiles().iterator();
+		while(fileIterator.hasNext()){
+			TullFile oldFile = fileIterator.next();
+			if(!newFolder.getSubfolders().contains(oldFile)){
+				this.getSubfolders().remove(oldFile);
+
+				System.out.println("Removed " + oldFile.getName());
+				for(TullFolder f: this.getSubfolders())
+					System.out.println(f.getName());
+			}
+		}
+		//now update existing files
+		for(TullFile file: this.getFiles()){
+			for(TullFile fetchedFile: newFolder.getFiles()){
+				if(fetchedFile.getName().equals(file.getName())){
+					file.update(fetchedFile.toJSON());
+				}
+			}
+		}
+		//now queue all folders for fetching.
+		for(TullFolder folder: this.getSubfolders()){
+			WorkerQueues.addJobToQueue("quick", new LoadTullFolderData(folder));
+		}
+	}
+	private static TullFolder fromJSON(TullFolder parent, String name, JSONObject json){
 		JSONArray fileArray = json.getJSONArray("files");
 		JSONArray folderArray = json.getJSONArray("subfolders");
+		TullFolder fetchedFolder = new TullFolder(name, parent);
 		for(int i=0;i<fileArray.length();i++){
 			JSONObject fileJSON = fileArray.getJSONObject(i);
-			this.files.add(new TullFile(fileJSON,this));
+			fetchedFolder.files.add(new TullFile(fileJSON,fetchedFolder));
 		}
 		for(int i=0;i<folderArray.length();i++){
 			String folderName = folderArray.getString(i);
-			this.subfolders.add(new TullFolder(folderName,this));
+			fetchedFolder.subfolders.add(new TullFolder(folderName,fetchedFolder));
 		}
+		return fetchedFolder;
+	}
+	public void removeFile(TullFile file){
+		this.files.remove(file);
 	}
 	public boolean delete(){
 		try {

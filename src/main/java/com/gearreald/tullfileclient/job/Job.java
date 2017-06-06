@@ -2,9 +2,12 @@ package com.gearreald.tullfileclient.job;
 
 import java.util.UUID;
 
+import com.gearreald.tullfileclient.Environment;
 import com.gearreald.tullfileclient.worker.HardStopException;
 import com.gearreald.tullfileclient.worker.WorkerException;
 import com.gearreald.tullfileclient.worker.WorkerQueues;
+
+import javafx.application.Platform;
 
 /**
  * An abstract class for jobs and their associated methods.
@@ -45,7 +48,8 @@ public abstract class Job {
 		if(failures>this.getRetries()){
 			throw new HardStopException(this.getFailureString());
 		}
-		theJob();
+		Platform.runLater(() -> {Environment.getInterfaceController().refreshDisplay();});
+		this.theJob();
 	}
 	
 	public int getRetries(){

@@ -2,11 +2,13 @@ package com.gearreald.tullfileclient.controllers;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.gearreald.tullfileclient.Environment;
+import com.gearreald.tullfileclient.job.LoadTullFolderData;
 import com.gearreald.tullfileclient.models.ErrorDialogBox;
 import com.gearreald.tullfileclient.models.ServerConnection;
 import com.gearreald.tullfileclient.models.TullFile;
@@ -14,6 +16,7 @@ import com.gearreald.tullfileclient.models.TullFolder;
 import com.gearreald.tullfileclient.models.TullObject;
 import com.gearreald.tullfileclient.utils.ResourceLoader;
 import com.gearreald.tullfileclient.utils.SystemUtils;
+import com.gearreald.tullfileclient.worker.WorkerQueues;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -113,30 +116,76 @@ public class InterfaceController {
 	public void setDisplayFolder(TullFolder f){
 		setDisplayFolder(f,false);
 	}
-	public void setDisplayFolder(TullFolder f,boolean forceRefresh){
-		this.current=f;
-		try{
-			this.current.fetchFolderData(forceRefresh);
-		}catch(IOException e){
-			ErrorDialogBox.dialogFor(e);
-		}
-		this.boxList.clear();
+	public void refreshDisplay(){
+		List<TullObject> tullObjects = new ArrayList<TullObject>();
 		for(TullFolder subfolder : this.current.getSubfolders()){
-			this.addTullObject(subfolder);
+			tullObjects.add(subfolder);
 		}
 		for(TullFile file : this.current.getFiles()){
-			this.addTullObject(file);
+			tullObjects.add(file);
+		}
+		for(TullObject item: tullObjects){
+			if(!containsTullObject(item)){
+				addTullObject(item);
+			}
+		}
+		for(TullObject item: getListOfContainedTullObjects()){
+			if(!tullObjects.contains(item))
+				removeTullObject(item);
+		}
+		for(ItemListController controller: this.itemControllers){
+			controller.refresh();
 		}
 	}
+	public void setDisplayFolder(TullFolder f,boolean forceRefresh){
+		this.current=f;
+		WorkerQueues.addJobToQueue("quick", new LoadTullFolderData(this.current,forceRefresh));
+		refreshDisplay();
+	}
+	private List<TullObject> getListOfContainedTullObjects(){
+		List<TullObject> objects = new ArrayList<TullObject>();
+		for(ItemListController controller: this.itemControllers){
+			objects.add(controller.getTullObject());
+		}
+		return objects;
+	}
+	private boolean containsTullObject(TullObject object){
+		for(ItemListController controller: this.itemControllers){
+			if(controller.getTullObject().equals(object)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	private void addTullObject(TullObject object){
+		if(containsTullObject(object))
+			return;
 		FXMLLoader loader = new FXMLLoader(ResourceLoader.getResourceURL("fxml/listItem.fxml"));
+		BorderPane pane=null;
 		try {
-			boxList.add(loader.<BorderPane>load());
+			pane = loader.<BorderPane>load();
 		} catch (IOException e) {
 			ErrorDialogBox.dialogFor(e);
 		}
-		ItemListController controller = loader.<ItemListController>getController();
-		this.itemControllers.add(controller);
-		controller.setTullObject(object);
+		if(pane!=null){
+			ItemListController controller = loader.<ItemListController>getController();
+			controller.setTullObject(object);
+			this.itemControllers.add(controller);
+			this.itemControllers.sort(null);
+			boxList.add(this.itemControllers.indexOf(controller), pane);
+		}
+	}
+	private void removeTullObject(TullObject object){
+		ItemListController container=null;
+		for(ItemListController controller: this.itemControllers){
+			if(controller.getTullObject().equals(object)) {
+				container=controller;
+			}
+		}
+		if(container==null)
+			return;
+		int index = this.itemControllers.indexOf(container);
+		this.itemControllers.remove(index);
+		this.boxList.remove(index);
 	}
 }

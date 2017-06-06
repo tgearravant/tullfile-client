@@ -9,16 +9,21 @@ import com.gearreald.tullfileclient.worker.WorkerException;
 
 public class LoadTullFolderData extends Job {
 
-	public TullFolder folder;
+	private TullFolder folder;
+	private boolean force;
 	public final static String JOB_NAME = "LoadData";
 	
 	public LoadTullFolderData(TullFolder f){
+		this(f,false);
+	}
+	public LoadTullFolderData(TullFolder f, boolean force){
 		super();
 		this.folder=f;
+		this.force=force;
 	}
 	public void theJob() throws WorkerException {
 		try {
-			this.folder.fetchFolderData(false);
+			this.folder.fetchFolderData(this.force);
 			this.completeJob();
 		} catch (IOException e) {
 			throw new WorkerException("There was an error fetching the folder data.",e);

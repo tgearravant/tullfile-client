@@ -29,14 +29,17 @@ public class TullFile implements TullObject, Comparable<TullFile> {
 	private long fileSize;
 	
 	public TullFile(JSONObject json,TullFolder parent){
-		pieceList = new CopyOnWriteArrayList<Piece>();
+		this.pieceList = new CopyOnWriteArrayList<Piece>();
 		if(parent==null){
 			ErrorDialogBox.dialogFor(new RuntimeException("A Tullfile must have a parent."));
 		}
-		this.name=json.getString("name");
-		this.pieceCount = json.getInt("pieces");
-		this.fileSize = json.getLong("size");
 		this.parent=parent;
+		this.update(json);
+	}
+	public void update(JSONObject json){
+		this.name=json.getString("name");
+		this.pieceCount=json.getInt("pieces");
+		this.fileSize=json.getLong("size");
 	}
 	public String getName(){
 		return this.name;
@@ -92,6 +95,7 @@ public class TullFile implements TullObject, Comparable<TullFile> {
 	public boolean delete(){
 		try {
 			ServerConnection.deleteFile(this.getLocalPath(), this.getName());
+			this.parent.removeFile(this);
 			return true;
 		} catch (IOException e) {
 			ErrorDialogBox.dialogFor(e);
@@ -191,6 +195,13 @@ public class TullFile implements TullObject, Comparable<TullFile> {
 	}
 	public boolean isTullFile(){
 		return true;
+	}
+	public JSONObject toJSON(){
+		JSONObject json = new JSONObject();
+		json.put("name", this.name);
+		json.put("pieces", this.pieceCount);
+		json.put("size", this.fileSize);		
+		return json;
 	}
 	@Override
 	public int hashCode() {
