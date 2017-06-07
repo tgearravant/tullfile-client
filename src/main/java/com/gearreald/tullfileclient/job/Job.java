@@ -48,8 +48,8 @@ public abstract class Job {
 		if(failures>this.getRetries()){
 			throw new HardStopException(this.getFailureString());
 		}
-		Platform.runLater(() -> {Environment.getInterfaceController().refreshDisplay();});
 		this.theJob();
+		Platform.runLater(() -> {Environment.getInterfaceController().refreshDisplay();});
 	}
 	
 	public int getRetries(){

@@ -25,7 +25,7 @@ import javafx.scene.control.ProgressBar;
 
 public class ItemListController implements Comparable<ItemListController> {
 	
-	private TullObject f;
+	private TullObject listObject;
 	@FXML private Label titleLabel;
 	@FXML private ImageView iconImage;
 	@FXML private Label pieceLabel;
@@ -38,18 +38,18 @@ public class ItemListController implements Comparable<ItemListController> {
 	@FXML private ProgressBar downloadProgressBar;
 	
 	public void setTullObject(TullObject f){
-		this.f=f;
+		this.listObject=f;
 		bindManagedAndVisible(this.openButton, this.downloadButton, this.downloadProgressBar, this.pieceLabel, this.pieceText, this.sizeLabel, this.sizeText);
 		this.openButton.managedProperty().bind(this.openButton.visibleProperty());
 		this.downloadButton.managedProperty().bind(this.downloadButton.visibleProperty());
 		this.downloadProgressBar.managedProperty().bind(this.downloadProgressBar.visibleProperty());
-		this.titleLabel.setText(this.f.getName());
+		this.titleLabel.setText(this.listObject.getName());
 		this.downloadProgressBar.setVisible(false);
-		if(this.f.isTullFile()){
+		if(this.listObject.isTullFile()){
 			this.iconImage.setImage(ImageUtils.getImage("file-icon.png"));
 			this.downloadButton.setVisible(true);
 		}
-		if(this.f.isTullFolder()){
+		if(this.listObject.isTullFolder()){
 			this.iconImage.setImage(ImageUtils.getImage("folder-icon.png"));
 			this.openButton.setVisible(true);
 			this.pieceLabel.setText("Folders:");
@@ -65,20 +65,20 @@ public class ItemListController implements Comparable<ItemListController> {
 	public void initialize(){
 	}
 	public void refresh(){
-		if(this.f.isTullFile()){
-			TullFile tullFile = (TullFile) this.f;
+		if(this.listObject.isTullFile()){
+			TullFile tullFile = (TullFile) this.listObject;
 			this.pieceText.setText(Integer.toString(tullFile.getPieceCount()));
 			this.sizeText.setText(tullFile.getFileSizeAsString());
 		}
-		if(this.f.isTullFolder()){
-			TullFolder tullFolder = (TullFolder) this.f;
+		if(this.listObject.isTullFolder()){
+			TullFolder tullFolder = (TullFolder) this.listObject;
 			this.pieceText.setText(Integer.toString(tullFolder.getSubfolders().size()));
 			this.sizeText.setText(Integer.toString(tullFolder.getFiles().size()));
 		}
 	}
 	@FXML
 	public void downloadFile(ActionEvent e){
-		TullFile tullFile = (TullFile) this.f;
+		TullFile tullFile = (TullFile) this.listObject;
 		FileChooser chooser = new FileChooser();
 		chooser.setInitialFileName(this.getTullObject().getName());
 		String suffix = tullFile.getSuffix();
@@ -98,7 +98,7 @@ public class ItemListController implements Comparable<ItemListController> {
 		Alert a = new ConfirmationDialog("Delete Confirmation", "Are you sure you want to delete this item? (There is no undo.)");
 		Optional<ButtonType> response = a.showAndWait();
 		if(response.get() == ButtonType.OK){
-			if(this.f.isTullFolder()){
+			if(this.listObject.isTullFolder()){
 				a = new ConfirmationDialog("Delete Confirmation", "You're requesting a directory delete. Are you /SUPER/ sure? All subfiles will also be irrevocably trashed.");
 				response = a.showAndWait();
 				if(response.get() != ButtonType.OK){
@@ -108,15 +108,17 @@ public class ItemListController implements Comparable<ItemListController> {
 		}else{
 			return;
 		}
-		if(this.f.delete())
-			Environment.getInterfaceController().refreshCurrentFolder();
+		if(this.listObject.delete()){
+			System.out.println("Refreshing after delete...");
+			Environment.getInterfaceController().refreshCurrentFolder(true);
+		}
 	}
 	@FXML 
 	public void changeInterfaceTullFolder(){
-		if(!this.f.isTullFolder())
+		if(!this.listObject.isTullFolder())
 			return;
 		InterfaceController controller = Environment.getInterfaceController();
-		controller.setDisplayFolder((TullFolder)this.f, false);
+		controller.setDisplayFolder((TullFolder)this.listObject, false);
 	}
 	public void setProgress(double d) {
 		this.downloadProgressBar.setProgress(d);
@@ -124,13 +126,13 @@ public class ItemListController implements Comparable<ItemListController> {
 			this.downloadProgressBar.setVisible(false);
 	}
 	public TullObject getTullObject(){
-		return this.f;
+		return this.listObject;
 	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((f == null) ? 0 : f.hashCode());
+		result = prime * result + ((listObject == null) ? 0 : listObject.hashCode());
 		return result;
 	}
 	@Override
@@ -142,10 +144,10 @@ public class ItemListController implements Comparable<ItemListController> {
 		if (getClass() != obj.getClass())
 			return false;
 		ItemListController other = (ItemListController) obj;
-		if (f == null) {
-			if (other.f != null)
+		if (listObject == null) {
+			if (other.listObject != null)
 				return false;
-		} else if (!f.equals(other.f))
+		} else if (!listObject.equals(other.listObject))
 			return false;
 		return true;
 	}
@@ -153,12 +155,12 @@ public class ItemListController implements Comparable<ItemListController> {
 	public int compareTo(ItemListController comp) {
 		if(this.equals(comp)){
 			return 0;
-		}else if(this.f.isTullFile() && comp.f.isTullFolder()){
+		}else if(this.listObject.isTullFile() && comp.listObject.isTullFolder()){
 			return 1;
-		}else if(this.f.isTullFolder() && comp.f.isTullFile()){
+		}else if(this.listObject.isTullFolder() && comp.listObject.isTullFile()){
 			return -1;
 		}else{
-			return this.f.getName().toLowerCase().compareTo(comp.f.getName().toLowerCase());
+			return this.listObject.getName().toLowerCase().compareTo(comp.listObject.getName().toLowerCase());
 		}
 	}
 }

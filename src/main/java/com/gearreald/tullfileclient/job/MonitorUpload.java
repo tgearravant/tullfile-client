@@ -33,9 +33,11 @@ public class MonitorUpload extends Job {
 			e.printStackTrace();
 			throw new WorkerException(e);
 		}
-		Platform.runLater(() -> {
-			Environment.getInterfaceController().refreshCurrentFolder();
-		});
+		if(this.completed()){
+			Platform.runLater(() -> {
+				Environment.getInterfaceController().refreshCurrentFolder(true);
+			});
+		}
 	}
 
 	@Override
