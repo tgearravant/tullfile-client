@@ -33,7 +33,7 @@ public class UploadFilePiece extends Job {
 		}
 		if(this.completed()){
 			Platform.runLater(() -> {
-				Environment.getInterfaceController().refreshCurrentFolder();
+				Environment.getInterfaceController().refreshCurrentFolder(true);
 			});
 		}
 	}
