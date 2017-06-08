@@ -62,7 +62,7 @@ public class InterfaceController {
 		Platform.exit();
 	}
 	@FXML private void refreshFolder(ActionEvent event){
-		this.refreshCurrentFolder();
+		this.refreshCurrentFolder(true);
 	}
 	@FXML private void uploadFile(ActionEvent event){
 		FileChooser chooser = new FileChooser();
@@ -105,7 +105,10 @@ public class InterfaceController {
 		}
 	}
 	public void refreshCurrentFolder(){
-		this.setDisplayFolder(this.current, true);
+		this.setDisplayFolder(this.current, false);
+	}
+	public void refreshCurrentFolder(boolean force){
+		this.setDisplayFolder(this.current, force);
 	}
 	public void updateProgressOfTullFile(TullFile file){
 		for(ItemListController controller:this.itemControllers){

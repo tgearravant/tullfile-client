@@ -38,8 +38,13 @@ public class TullFile implements TullObject, Comparable<TullFile> {
 		this.pieceCount=json.getInt("pieces");
 		this.fileSize=json.getLong("size");
 	}
+	@Override
 	public String getName(){
 		return this.name;
+	}
+	@Override
+	public TullFolder getParent() {
+		return this.parent;
 	}
 	public long getFileSize(){
 		return this.fileSize;
@@ -75,6 +80,7 @@ public class TullFile implements TullObject, Comparable<TullFile> {
 			return "*";
 		}
 	}
+	@Override
 	public String getLocalPath(){
 		return this.parent.getLocalPath();
 	}
@@ -89,6 +95,7 @@ public class TullFile implements TullObject, Comparable<TullFile> {
 		}
 		return (double)verified/this.pieceCount;
 	}
+	@Override
 	public boolean delete(){
 		try {
 			ServerConnection.deleteFile(this.getLocalPath(), this.getName());
@@ -200,11 +207,17 @@ public class TullFile implements TullObject, Comparable<TullFile> {
 		return json;
 	}
 	@Override
+	public int compareTo(TullFile o) {
+		if(this.equals(o))
+			return 0;
+		return this.name.toLowerCase().compareTo(o.name.toLowerCase());
+	}
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((parent == null) ? 0 : parent.hashCode());
+		result = prime * result + ((this.getLocalPath() == null) ? 0 : this.getLocalPath().hashCode());
 		return result;
 	}
 	@Override
@@ -221,17 +234,11 @@ public class TullFile implements TullObject, Comparable<TullFile> {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
-		if (parent == null) {
-			if (other.parent != null)
+		if (this.getLocalPath() == null) {
+			if (other.getLocalPath() != null)
 				return false;
-		} else if (!parent.equals(other.parent))
+		} else if (!this.getLocalPath().equals(other.getLocalPath()))
 			return false;
 		return true;
-	}
-	@Override
-	public int compareTo(TullFile o) {
-		if(this.equals(o))
-			return 0;
-		return this.name.toLowerCase().compareTo(o.name.toLowerCase());
 	}
 }

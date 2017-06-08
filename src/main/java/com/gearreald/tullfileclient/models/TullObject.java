@@ -6,6 +6,7 @@ public abstract interface TullObject {
 	public boolean isTullFile();
 	public boolean isTullFolder();
 	public boolean delete();
-	public abstract boolean equals(Object o);
-	public abstract int hashCode();
+	public boolean equals(Object o);
+	public int hashCode();
+	public TullFolder getParent();
 }
