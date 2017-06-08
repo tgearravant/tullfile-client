@@ -3,7 +3,7 @@ tullfile_suffix=.tullfile
 
 environment=development
 
-use_ssl=true
+default_ssl=false
 
 default_host=127.0.0.1
 default_port=12345

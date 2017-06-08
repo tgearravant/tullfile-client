@@ -12,6 +12,7 @@ public class VerifyPiece extends Job {
 	private boolean done;
 	
 	public VerifyPiece(Piece piece){
+		super();
 		this.piece=piece;
 		this.done=false;
 	}

@@ -17,6 +17,7 @@ public class VerifyAndMergeFile extends Job {
 	private File destination;
 	
 	public VerifyAndMergeFile(TullFile f, File destination){
+		super();
 		this.file=f;
 		this.destination=destination;
 	}

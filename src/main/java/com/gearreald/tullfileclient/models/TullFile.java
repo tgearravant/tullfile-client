@@ -10,9 +10,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.json.JSONObject;
 
 import com.gearreald.tullfileclient.job.DownloadTullFilePiece;
-import com.gearreald.tullfileclient.job.Job;
-import com.gearreald.tullfileclient.job.MonitorUpload;
-import com.gearreald.tullfileclient.job.UploadFilePiece;
 import com.gearreald.tullfileclient.job.VerifyAndMergeFile;
 import com.gearreald.tullfileclient.job.VerifyPiece;
 import com.gearreald.tullfileclient.worker.WorkerQueues;
@@ -117,8 +114,7 @@ public class TullFile implements TullObject, Comparable<TullFile> {
 			if(p.invalid()){
 				this.pieceList.remove(p);
 				p.deletePiece();
-				Job j = new DownloadTullFilePiece(this,p.getPieceNumber());
-				WorkerQueues.addJobToQueue("download",j);
+				WorkerQueues.addJobToQueue("download",new DownloadTullFilePiece(this,p.getPieceNumber()));
 			}
 		}
 	}
@@ -231,13 +227,6 @@ public class TullFile implements TullObject, Comparable<TullFile> {
 		} else if (!parent.equals(other.parent))
 			return false;
 		return true;
-	}
-	public static void queueAllPiecesForUpload(File f, String localPath, String name){
-		int piecesInFile = ServerConnection.piecesInFile(f);
-		for(int i = 1; i<=piecesInFile; i++){
-			WorkerQueues.addJobToQueue("upload",new UploadFilePiece(f,localPath,name,i));
-		}
-		WorkerQueues.addJobToQueue("quick", new MonitorUpload(f,localPath,name));
 	}
 	@Override
 	public int compareTo(TullFile o) {

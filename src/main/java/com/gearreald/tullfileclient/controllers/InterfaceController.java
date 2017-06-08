@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.gearreald.tullfileclient.Environment;
 import com.gearreald.tullfileclient.job.LoadTullFolderData;
+import com.gearreald.tullfileclient.job.QueueUpload;
 import com.gearreald.tullfileclient.models.ErrorDialogBox;
 import com.gearreald.tullfileclient.models.ServerConnection;
 import com.gearreald.tullfileclient.models.TullFile;
@@ -72,7 +73,7 @@ public class InterfaceController {
 				if(file.isDirectory()){
 					ErrorDialogBox.dialogFor(new Exception("Cannot currently upload directories."));
 				}else{
-					TullFile.queueAllPiecesForUpload(file, this.current.getLocalPath(), file.getName());
+					WorkerQueues.addJobToQueue("quick", new QueueUpload(file, this.current.getLocalPath(), file.getName()));
 				}
 			}
 		}

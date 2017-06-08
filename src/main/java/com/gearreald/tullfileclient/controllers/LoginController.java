@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -24,6 +25,7 @@ public class LoginController {
     @FXML private TextField portField;
     @FXML private PasswordField keyField;
     @FXML private Text actionTarget;
+	@FXML private CheckBox sslBox;
         
     @FXML public void initialize(){
     	autofillDefaults();
@@ -45,6 +47,7 @@ public class LoginController {
     	String apiKey = this.keyField.getText();
     	Environment.setConfiguration("HOSTNAME", serverAddress);
     	Environment.setConfiguration("API_KEY", apiKey);
+    	Environment.setConfiguration("USE_SSL", Boolean.toString(this.sslBox.isSelected()));
     	try {
 			ServerConnection.checkKey();
 		} catch (MalformedURLException e) {
@@ -80,5 +83,10 @@ public class LoginController {
     	this.portField.setText(Environment.getConfiguration("default_port"));
 		this.serverAddressField.setText(Environment.getConfiguration("default_host"));
 		this.keyField.setText(Environment.getConfiguration("default_key"));
+		if(Environment.getConfiguration("default_ssl").equals("true")){
+			this.sslBox.setSelected(true);
+		}else{
+			this.sslBox.setSelected(false);
+		}
     }
 }

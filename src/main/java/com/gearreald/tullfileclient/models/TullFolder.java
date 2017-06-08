@@ -51,7 +51,6 @@ public class TullFolder implements TullObject, Comparable<TullFolder> {
 			this.fetched=false;
 		if(this.fetched)
 			return;
-		System.out.println("Fetching... "+this.toString());
 		JSONObject folderJSON = ServerConnection.getFileListing(this.getLocalPath());
 		TullFolder fetchedFolder = TullFolder.fromJSON(this.getParentFolder(), this.getName(), folderJSON.getJSONObject("response"));
 		this.update(fetchedFolder);
@@ -84,10 +83,6 @@ public class TullFolder implements TullObject, Comparable<TullFolder> {
 			TullFile oldFile = fileIterator.next();
 			if(!newFolder.getSubfolders().contains(oldFile)){
 				this.getSubfolders().remove(oldFile);
-
-				System.out.println("Removed " + oldFile.getName());
-				for(TullFolder f: this.getSubfolders())
-					System.out.println(f.getName());
 			}
 		}
 		//now update existing files

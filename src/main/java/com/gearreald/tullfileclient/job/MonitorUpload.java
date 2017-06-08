@@ -3,11 +3,8 @@ package com.gearreald.tullfileclient.job;
 import java.io.File;
 import java.io.IOException;
 
-import com.gearreald.tullfileclient.Environment;
 import com.gearreald.tullfileclient.models.ServerConnection;
 import com.gearreald.tullfileclient.worker.WorkerException;
-
-import javafx.application.Platform;
 
 public class MonitorUpload extends Job {
 
@@ -33,9 +30,6 @@ public class MonitorUpload extends Job {
 			e.printStackTrace();
 			throw new WorkerException(e);
 		}
-		Platform.runLater(() -> {
-			Environment.getInterfaceController().refreshCurrentFolder();
-		});
 	}
 
 	@Override

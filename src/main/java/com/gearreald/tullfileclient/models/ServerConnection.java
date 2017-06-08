@@ -312,7 +312,7 @@ public class ServerConnection {
 		return (int)(f.length()/CHUNK_SIZE)+(f.length() % CHUNK_SIZE > 0 ? 1 : 0);
 	}
 	private static boolean useSSL(){
-		if(Environment.getConfiguration("use_ssl").equals("true"))
+		if(Environment.getConfiguration("USE_SSL").equals("true"))
 			return true;
 		else
 			return false;
